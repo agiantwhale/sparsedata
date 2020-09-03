@@ -2,7 +2,7 @@
 title:               SPARSEDATA.ML
 tagline:             'thinking machines'
 description:         'Blog of Il Jae Lee.'
-url:                 http://sparsedata.ml
+url:                 https://sparsedata.ml
 baseurl:             ''
 paginate:            5
 permalink:           pretty
