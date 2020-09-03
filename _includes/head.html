@@ -16,10 +16,14 @@
   <link rel="canonical" href="{{ page.url | absolute_url }}">
   {% endif %}
 
-  <style>
+  {% capture style %}
   {% asset css/poole.css %}
-  {% asset css/syntax.css %}
   {% asset css/lanyon.css %}
+  {% asset css/syntax.css %}
+  {% endcapture %}
+
+  <style>
+  {{ style | scssify }}
   </style>
   <!-- <link rel="stylesheet" href="{{ '/public/css/poole.css' | absolute_url }}">
   <link rel="stylesheet" href="{{ '/public/css/syntax.css' | absolute_url }}">

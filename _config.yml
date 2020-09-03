@@ -19,9 +19,24 @@ author:
   email:             agiantwhale@gmail.com
 
 # Assets
+sass:
+  style:             compressed
+
 assets:
+  compression: true
+  gzip: true
   sources:
     - _assets/
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  ignore:
+    envs: []
+  blanklines: false
+  profile: false
+  startings: []
 
 # Gems
 plugins:
