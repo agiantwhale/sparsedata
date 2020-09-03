@@ -1,11 +1,11 @@
 ---
 layout: page
 title: About
+show_title: false
 ---
-I'm Il Jae Lee. Welcome to my blog.
+![Machine Learning](https://imgs.xkcd.com/comics/machine_learning.png)
 
-### Author
-
+### Il Jae Lee
 * Programmer with special interests in distributed and intelligent systems.
 * Currently working on contents understanding, Newsfeed ranking & recommendation problems at [Facebook](https://engineering.fb.com/).
 * Previously worked at [SalesforceIQ](https://engineering.salesforce.com/) and [Fountain](https://get.fountain.com/).
