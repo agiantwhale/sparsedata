@@ -2,7 +2,7 @@
 title:               SPARSEDATA.ML
 tagline:             'thinking machines'
 description:         'Blog of Il Jae Lee.'
-url:                 http://lanyon.getpoole.com
+url:                 http://sparsedata.ml
 baseurl:             ''
 paginate:            5
 permalink:           pretty
@@ -14,9 +14,9 @@ liquid_latex:
 
 # About/contact
 author:
-  name:              Mark Otto
-  url:               https://twitter.com/mdo
-  email:             markdotto@gmail.com
+  name:              Il Jae Lee
+  url:               https://sparsedata.ml
+  email:             agiantwhale@gmail.com
 
 # Gems
 plugins:
