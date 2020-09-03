@@ -10,7 +10,7 @@ permalink:           pretty
 # Liquid latex
 liquid_latex:
   density:           150
-  usepackages:       amsmath,amssymb,mathtools
+  usepackages:       amsmath,amssymb,mathtools,dot2texi,tikz
 
 # About/contact
 author:

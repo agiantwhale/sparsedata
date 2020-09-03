@@ -10,10 +10,9 @@ module Jekyll
         "debug" => true,
         "density" => "300",
         "usepackages" => "",
-        "latex_cmd" => "latex -interaction=nonstopmode $texfile > /dev/null 2>&1",
-        "dvips_cmd" => "dvips -E $dvifile -o $epsfile > /dev/null 2>&1",
-        "convert_cmd" => "convert -density $density $epsfile $pngfile > /dev/null 2>&1",
-        "temp_filename" => "latex_temp",
+        "latex_cmd" => "pdflatex -interaction=nonstopmode -shell-escape $texfile > /dev/null 2>&1",
+        "convert_cmd" => "convert -density $density $pdffile $pngfile > /dev/null 2>&1",
+        "temp_filename" => "tmp_latex_render",
         "output_directory" => "/latex",
         "src_dir" => "",
         "dst_dir" => "",
@@ -66,8 +65,7 @@ module Jekyll
       def execute_cmd(cmd)
         cmd = cmd.gsub("\$density", @p["density"].to_s)
         cmd = cmd.gsub("\$texfile", @p["tex_fn"])
-        cmd = cmd.gsub("\$dvifile", @p["dvi_fn"])
-        cmd = cmd.gsub("\$epsfile", @p["eps_fn"])
+        cmd = cmd.gsub("\$pdffile", @p["pdf_fn"])
         cmd = cmd.gsub("\$pngfile", @p["png_fn"])
         puts cmd if @@globals["debug"]
         system(cmd)
@@ -91,14 +89,14 @@ module Jekyll
         if !File.exists?(@p["png_fn"])
           puts "Compiling with LaTeX..." if @@globals["debug"]
           @p["tex_fn"] = @@globals["temp_filename"] + ".tex"
-          @p["dvi_fn"] = @@globals["temp_filename"] + ".dvi"
-          @p["eps_fn"] = @@globals["temp_filename"] + ".eps"
+          @p["pdf_fn"] = @@globals["temp_filename"] + ".pdf"
 
           # Put the LaTeX source code to file
-          latex_tex = "\\documentclass[letterpaper,dvips]{article}\n"
+          latex_tex = "\\documentclass[preview]{standalone}\n"
           @p["usepackages"].gsub(" ","").split(",").each do |packagename|
             latex_tex << "\\usepackage\{#{packagename}\}\n"
           end
+          latex_tex << "\\usetikzlibrary{shapes,arrows}\n"
           latex_tex << "\\begin{document}\n\\pagestyle{empty}\n"
           latex_tex << latex_source
           latex_tex << "\\end{document}"
@@ -107,10 +105,9 @@ module Jekyll
           tex_file.close
           # Compile the document to PNG
           ok = execute_cmd(@@globals["latex_cmd"])
-          execute_cmd(@@globals["dvips_cmd"]) if ok
           execute_cmd(@@globals["convert_cmd"]) if ok
           # Delete temporary files
-          Dir.glob(@@globals["temp_filename"] + ".*").each do |f|
+          Dir.glob(@@globals["temp_filename"] + "*").each do |f|
             File.delete(f)
           end
         end
