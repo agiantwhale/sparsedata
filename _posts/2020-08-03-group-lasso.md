@@ -10,17 +10,17 @@ Through this entry, we hope to examine the application of the group LASSO regula
 The loss function of ridge regression can be defined as
 
 {% latex class=center %}
-\begin{align*}
+$\begin{aligned}
 \arg \min_{\beta_0, \beta} \Sigma_{i=1}^n (y_i - (x_i^T\beta + \beta_0))^2 + \lambda \Sigma_{j=1}^p \beta_j^2
-\end{align*}
+\end{aligned}$
 {% endlatex %}
 
 while loss function of LASSO regression can be defined as
 
 {% latex class=center %}
-\begin{align*}
+$\begin{aligned}
 \arg \min_{\beta_0, \beta} \Sigma_{i=1}^n (y_i - (x_i^T\beta + \beta_0))^2 + \lambda \Sigma_{j=1}^p \lvert \beta_j \rvert
-\end{align*}
+\end{aligned}$
 {% endlatex %}
 
 The above loss functions can be broken down into
@@ -39,9 +39,9 @@ From the above example, we observe how LASSO regularization can help with the in
 Group LASSO attempts to solve this problem by separating the entire feature set into separate feature groups. The regularization function can be written as
 
 {% latex class=center %}
-\begin{align*}
+$\begin{aligned}
 \arg \min_{\beta_0, \beta} \Sigma_{i=1}^n (y_i - (x_i^T\beta + \beta_0))^2 + \lambda \Sigma_{g=1}^G \sqrt{d_g} \lvert\lvert \beta^g \rvert\rvert_2
-\end{align*}
+\end{aligned}$
 {% endlatex %}
 
 where
@@ -53,9 +53,9 @@ Let's take a closer look at the regularization term {% latex %}$\lambda \Sigma_{
 Note that {% latex %}$\lvert\lvert \beta^g \rvert\rvert_2 \geq 0${% endlatex %}, and we for some {% latex %}$R${% endlatex %} that satisfies {% latex %}$\sqrt{d_g} \lvert\lvert \beta^g \rvert\rvert_2 = \lvert R \rvert${% endlatex %}, we could effectively rewrite the equation as
 
 {% latex class=center %}
-\begin{align*}
+$\begin{aligned}
 \lambda \Sigma_{g=1}^G \sqrt{d_g} \lvert\lvert \beta^g \rvert\rvert_2 = \lambda \Sigma_{g=1}^G \lvert R \rvert
-\end{align*}
+\end{aligned}$
 {% endlatex %}
 
 In this case, we have effectively reduced the regularization to LASSO regularization on the inter-group level.
@@ -63,13 +63,13 @@ In this case, we have effectively reduced the regularization to LASSO regulariza
 Similarly, let's take a look an subgroup. Expanding the term for some group with cardinality {% latex %}$p${% endlatex %}, the regularization term can be expressed as
 
 {% latex class=center %}
-\begin{align*}
+$\begin{aligned}
 \arg \min_{\beta} \lambda \Sigma_{g=1}^G \sqrt{d_g} \lvert\lvert \beta^g \rvert\rvert_2 
 &\equiv \arg \min_{\beta^g} \sqrt{d_g} \lvert\lvert \beta^g \rvert\rvert_2  \hspace{10px} (\because \forall \lvert\lvert \beta^g \rvert\rvert_2 >= 0) \\
 &= \arg \min_{\beta^g} \sqrt{p} \sqrt{b_1^2 + b_2^2 + b_3^2 + \cdots + b_p^2} \\ 
 &= \arg \min_{\beta^g} \sqrt{p} \sqrt{\Sigma_{i=1}^p b_i^2} \\ 
 &\equiv \lambda \arg \min_{b} \Sigma_{i=1}^p b_i^2
-\end{align*}
+\end{aligned}$
 {% endlatex %}
 
 Here, we have effectively reduced the regularization to ridge regularization on the intra-group level.
@@ -175,17 +175,17 @@ digraph G {
 In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let {% latex %}$w_1${% endlatex %} and {% latex %}$w_2${% endlatex %} denote the weight vectors for input features {% latex %}$x_1${% endlatex %} and {% latex %}$x_2${% endlatex %} ({% latex %}$w_2${% endlatex %} weights would be marked in red above). We can adapt the group LASSO regularization formulation as
 
 {% latex class=center %}
-\begin{align*}
+$\begin{aligned}
 \arg \min_{w} \Sigma_{i=1}^n L(y_i, f(x_1, x_2)) + \lambda \Sigma_{g=1}^{G=2} \sqrt{d_g} \lvert\lvert w_g \rvert\rvert_2
-\end{align*}
+\end{aligned}$
 {% endlatex %}
 
 where {% latex %}$L${% endlatex %} denotes the loss function and {% latex %}$w_i${% endlatex %} denotes the full-connected weights to feature {% latex %}$f_i${% endlatex %}. Since we have two input features, the regularization term would also expand to
 
 {% latex class=center %}
-\begin{align*}
+$\begin{aligned}
 \lambda \cdot \sqrt{3} \cdot (\lvert\lvert w_1 \rvert\rvert_2 + \lvert\lvert w_2 \rvert\rvert_2)
-\end{align*}
+\end{aligned}$
 {% endlatex %}
 
 We have essentially derived the Group level lasso regularization on each of the individual features, with the weights corresponding to each feature in a group. We can continue to build on the intuition from the Group LASSO.

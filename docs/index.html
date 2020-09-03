@@ -107,11 +107,11 @@
 <h2 id="what-is-ridge-and-lasso-regularization">What is ridge and LASSO regularization?</h2>
 <p>The loss function of ridge regression can be defined as</p>
 
-<p><img class="center" src="/latex/latex-faa66a4b2985f120a5a66df452280855.png" /></p>
+<p><img class="center" src="/latex/latex-c7c7175b6d0fda1e1560e89d5e35aae7.png" /></p>
 
 <p>while loss function of LASSO regression can be defined as</p>
 
-<p><img class="center" src="/latex/latex-7d8d2ed1b66d7d440e223ec714128e3d.png" /></p>
+<p><img class="center" src="/latex/latex-24eaf72a760a8844df4b99b643003ffe.png" /></p>
 
 <p>The above loss functions can be broken down into</p>
 <ul>
@@ -133,7 +133,7 @@
 
 <p>Group LASSO attempts to solve this problem by separating the entire feature set into separate feature groups. The regularization function can be written as</p>
 
-<p><img class="center" src="/latex/latex-ad590a96e9fcb6bc3ed238f2f79422a8.png" /></p>
+<p><img class="center" src="/latex/latex-27db441fda25ea2ae491cef51821fc3a.png" /></p>
 
 <p>where</p>
 <ul>
@@ -145,13 +145,13 @@
 
 <p>Note that <img class="inline" src="/latex/latex-07c12a111431708676e4b616cf99b1c4.png" />, and we for some <img class="inline" src="/latex/latex-3423d9f68d3c58eb1c2a7ba2406c8486.png" /> that satisfies <img class="inline" src="/latex/latex-c928cdd4076c47f86b97795e50736208.png" />, we could effectively rewrite the equation as</p>
 
-<p><img class="center" src="/latex/latex-daf5bf3707c40aa0822a0583d9b39b58.png" /></p>
+<p><img class="center" src="/latex/latex-be060941d7dd8bb1ab1b990ad316c765.png" /></p>
 
 <p>In this case, we have effectively reduced the regularization to LASSO regularization on the inter-group level.</p>
 
 <p>Similarly, let’s take a look an subgroup. Expanding the term for some group with cardinality <img class="inline" src="/latex/latex-92890e3f771562f4634e4cc92b907d81.png" />, the regularization term can be expressed as</p>
 
-<p><img class="center" src="/latex/latex-59bd5f68afe47e2f4f1718ca4a9f88f2.png" /></p>
+<p><img class="center" src="/latex/latex-e87f42f2e84d0ecdc422bfc61968e45c.png" /></p>
 
 <p>Here, we have effectively reduced the regularization to ridge regularization on the intra-group level.</p>
 
@@ -176,11 +176,11 @@
 
 <p>In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let <img class="inline" src="/latex/latex-ebd0382095ca74bec510b9310b6be292.png" /> and <img class="inline" src="/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png" /> denote the weight vectors for input features <img class="inline" src="/latex/latex-605b40b292da6874f4beb23bc331a715.png" /> and <img class="inline" src="/latex/latex-81f9067e7235468ca35b473aa81f7687.png" /> (<img class="inline" src="/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png" /> weights would be marked in red above). We can adapt the group LASSO regularization formulation as</p>
 
-<p><img class="center" src="/latex/latex-a6f3531b8c63f968770a840471665dda.png" /></p>
+<p><img class="center" src="/latex/latex-a55892be11cc606dae53876ff19861bc.png" /></p>
 
 <p>where <img class="inline" src="/latex/latex-a07c1d173c0194d2e4de57138b5509e6.png" /> denotes the loss function and <img class="inline" src="/latex/latex-337ead63544f0846525a5b7427f7992b.png" /> denotes the full-connected weights to feature <img class="inline" src="/latex/latex-0f29ea2ae0be79f664cc13af8c9bb3d0.png" />. Since we have two input features, the regularization term would also expand to</p>
 
-<p><img class="center" src="/latex/latex-65cd871842bd245b456933a477a6f33f.png" /></p>
+<p><img class="center" src="/latex/latex-ec39141da2aca3d8c8e14e5915368473.png" /></p>
 
 <p>We have essentially derived the Group level lasso regularization on each of the individual features, with the weights corresponding to each feature in a group. We can continue to build on the intuition from the Group LASSO.</p>
 

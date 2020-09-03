@@ -4,7 +4,7 @@
  <title>SPARSEDATA.ML</title>
  <link href="https://sparsedata.ml/atom.xml" rel="self"/>
  <link href="https://sparsedata.ml/"/>
- <updated>2020-09-03T03:36:21-07:00</updated>
+ <updated>2020-09-03T08:56:59-07:00</updated>
  <id>https://sparsedata.ml</id>
  <author>
    <name>Il Jae Lee</name>
@@ -24,11 +24,11 @@
 &lt;h2 id=&quot;what-is-ridge-and-lasso-regularization&quot;&gt;What is ridge and LASSO regularization?&lt;/h2&gt;
 &lt;p&gt;The loss function of ridge regression can be defined as&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-faa66a4b2985f120a5a66df452280855.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-c7c7175b6d0fda1e1560e89d5e35aae7.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;while loss function of LASSO regression can be defined as&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-7d8d2ed1b66d7d440e223ec714128e3d.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-24eaf72a760a8844df4b99b643003ffe.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The above loss functions can be broken down into&lt;/p&gt;
 &lt;ul&gt;
@@ -50,7 +50,7 @@
 
 &lt;p&gt;Group LASSO attempts to solve this problem by separating the entire feature set into separate feature groups. The regularization function can be written as&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-ad590a96e9fcb6bc3ed238f2f79422a8.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-27db441fda25ea2ae491cef51821fc3a.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;where&lt;/p&gt;
 &lt;ul&gt;
@@ -62,13 +62,13 @@
 
 &lt;p&gt;Note that &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-07c12a111431708676e4b616cf99b1c4.png&quot; /&gt;, and we for some &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-3423d9f68d3c58eb1c2a7ba2406c8486.png&quot; /&gt; that satisfies &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c928cdd4076c47f86b97795e50736208.png&quot; /&gt;, we could effectively rewrite the equation as&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-daf5bf3707c40aa0822a0583d9b39b58.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-be060941d7dd8bb1ab1b990ad316c765.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In this case, we have effectively reduced the regularization to LASSO regularization on the inter-group level.&lt;/p&gt;
 
 &lt;p&gt;Similarly, let’s take a look an subgroup. Expanding the term for some group with cardinality &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-92890e3f771562f4634e4cc92b907d81.png&quot; /&gt;, the regularization term can be expressed as&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-59bd5f68afe47e2f4f1718ca4a9f88f2.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-e87f42f2e84d0ecdc422bfc61968e45c.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Here, we have effectively reduced the regularization to ridge regularization on the intra-group level.&lt;/p&gt;
 
@@ -93,11 +93,11 @@
 
 &lt;p&gt;In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-ebd0382095ca74bec510b9310b6be292.png&quot; /&gt; and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png&quot; /&gt; denote the weight vectors for input features &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-605b40b292da6874f4beb23bc331a715.png&quot; /&gt; and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-81f9067e7235468ca35b473aa81f7687.png&quot; /&gt; (&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png&quot; /&gt; weights would be marked in red above). We can adapt the group LASSO regularization formulation as&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-a6f3531b8c63f968770a840471665dda.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-a55892be11cc606dae53876ff19861bc.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;where &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-a07c1d173c0194d2e4de57138b5509e6.png&quot; /&gt; denotes the loss function and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-337ead63544f0846525a5b7427f7992b.png&quot; /&gt; denotes the full-connected weights to feature &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-0f29ea2ae0be79f664cc13af8c9bb3d0.png&quot; /&gt;. Since we have two input features, the regularization term would also expand to&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-65cd871842bd245b456933a477a6f33f.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-ec39141da2aca3d8c8e14e5915368473.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We have essentially derived the Group level lasso regularization on each of the individual features, with the weights corresponding to each feature in a group. We can continue to build on the intuition from the Group LASSO.&lt;/p&gt;
 
