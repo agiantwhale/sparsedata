@@ -85,99 +85,92 @@ Up to now, the application of regularization terms have been on linear regressio
 
 To visualize this, say we have a small neural network with one hidden layer.
 
-```
+{% latex class=center %}
+\begin{dot2tex}[options=-traw --autosize]
 digraph G {
-    graph [bgcolor=black, fontcolor=white];
-    node [label=""];
-    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color=white, fontsize=12,
-            fontcolor=white]
+    node[label="" shape=circle];
+    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, fontsize=12, color=black]
     rankdir=LR
     splines=line
     nodesep=.15;
-        HelloWorld$
+        
     subgraph cluster_0 {
-        node [style=filled,color=white, shape=circle];
-		x1[label="x_1"] x2[label="x_2"];
-		label="Input features";
-	}
+        x1[label="$x_1$"] x2[label="$x_2$"];
+        color=white;
+    }
 
-	subgraph cluster_1 {
-		node [style=filled,color=white, shape=circle];
-		a12 a22 a32;
-		label="Hidden layer";
-	}
+    subgraph cluster_1 {
+        a12 a22 a32 a42;
+        color=white;
+    }
 
-	subgraph cluster_2 {
-		node [style=filled,color=white, shape=circle];
-		O1[label="f(x_1, x_2)"];
-		label="Output logit";
-	}
+    subgraph cluster_2 {
+        O1[label="$f(x_1, x_2)$"];
+        color=white;
+    }
 
     x1 -> a12;
     x1 -> a22;
     x1 -> a32;
+    x1 -> a42;
 
     x2 -> a12;
     x2 -> a22;
     x2 -> a32;
+    x2 -> a42;
 
     a12 -> O1;
     a22 -> O1;
     a32 -> O1;
+    a42 -> O1;
 }
-```
+\end{dot2tex}
+{% endlatex %}
 
 In order for the above feature selection to work, we will need to zero out the weights connected for all of feature {% latex %}$x_2${% endlatex %} (marked in red).
 
-```
+{% latex class=center %}
+\begin{dot2tex}[options=-traw --autosize]
 digraph G {
-    graph [bgcolor=black, fontcolor=white];
-    node [label=""];
-    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, color=white, fontsize=12,
-            fontcolor=white]
+    node[label="" shape=circle];
+    edge[arrowhead=vee, arrowtail=inv, arrowsize=.7, fontsize=12, color=black]
     rankdir=LR
     splines=line
     nodesep=.15;
-        HelloWorld$
+        
     subgraph cluster_0 {
-        style="";
-        node [style=filled,color=white, shape=circle];
-		x1[label="x_1"] x2[label="x_2"];
-		label="Input features";
-	}
-
-	subgraph cluster_1 {
-        style="";
-		node [style=filled,color=white, shape=circle];
-		a12 a22 a32;
-		label="Hidden layer";
-	}
-
-	subgraph cluster_2 {
-        style="";
-		node [style=filled,color=white, shape=circle];
-		O1[label="f(x_1, x_2)"];
-		label="Output logit";
-	}
-
-	subgraph edge_1 {
-        x1 -> a12;
-        x1 -> a22;
-        x1 -> a32;
+        x1[label="$x_1$"] x2[label="$x_2$"];
+        color=white;
     }
 
-	subgraph edge_3 {
-        edge [color=red, penwidth=3];
-        x2 -> a12;
-        x2 -> a22;
-        x2 -> a32;
+    subgraph cluster_1 {
+        a12 a22 a32 a42;
+        color=white;
     }
+
+    subgraph cluster_2 {
+        O1[label="$f(x_1, x_2)$"];
+        color=white;
+    }
+
+    x1 -> a12;
+    x1 -> a22;
+    x1 -> a32;
+    x1 -> a42;
 
     a12 -> O1;
     a22 -> O1;
     a32 -> O1;
+    a42 -> O1;
+
+    edge[color=red]
+    x2 -> a12;
+    x2 -> a22;
+    x2 -> a32;
+    x2 -> a42;
 }
-```
+\end{dot2tex}
+{% endlatex %}
 
 In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let {% latex %}$w_1${% endlatex %} and {% latex %}$w_2${% endlatex %} denote the weight vectors for input features {% latex %}$x_1${% endlatex %} and {% latex %}$x_2${% endlatex %} ({% latex %}$w_2${% endlatex %} weights would be marked in red above). We can adapt the group LASSO regularization formulation as
 
