@@ -4,7 +4,7 @@
  <title>SPARSEDATA.ML</title>
  <link href="https://sparsedata.ml/atom.xml" rel="self"/>
  <link href="https://sparsedata.ml/"/>
- <updated>2020-09-03T09:19:14-07:00</updated>
+ <updated>2020-09-03T09:44:46-07:00</updated>
  <id>https://sparsedata.ml</id>
  <author>
    <name>Il Jae Lee</name>
@@ -85,11 +85,11 @@
 
 &lt;p&gt;To visualize this, say we have a small neural network with one hidden layer.&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-9eb9d823f4c04b0dfbf228db0be95161.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-c3efb31e3d8abbaee114c46b16b82d97.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In order for the above feature selection to work, we will need to zero out the weights connected for all of feature &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-81f9067e7235468ca35b473aa81f7687.png&quot; /&gt; (marked in red).&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-7067d5e989ac0f8351e7d89c292f3b68.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-db690d40016e4da878ebfe529c17234a.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-ebd0382095ca74bec510b9310b6be292.png&quot; /&gt; and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png&quot; /&gt; denote the weight vectors for input features &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-605b40b292da6874f4beb23bc331a715.png&quot; /&gt; and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-81f9067e7235468ca35b473aa81f7687.png&quot; /&gt; (&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png&quot; /&gt; weights would be marked in red above). We can adapt the group LASSO regularization formulation as&lt;/p&gt;
 

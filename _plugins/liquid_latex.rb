@@ -12,6 +12,7 @@ module Jekyll
         "usepackages" => "",
         "latex_cmd" => "pdflatex -interaction=nonstopmode -shell-escape $texfile > /dev/null 2>&1",
         "convert_cmd" => "convert -density $density $pdffile $pngfile > /dev/null 2>&1",
+        "optimize_cmd" => "optipng -o7 $pngfile > /dev/null 2>&1",
         "temp_filename" => "tmp_latex_render",
         "output_directory" => "/latex",
         "src_dir" => "",
@@ -105,7 +106,8 @@ module Jekyll
           tex_file.close
           # Compile the document to PNG
           ok = execute_cmd(@@globals["latex_cmd"])
-          execute_cmd(@@globals["convert_cmd"]) if ok
+          ok = execute_cmd(@@globals["convert_cmd"]) if ok
+          ok = execute_cmd(@@globals["optimize_cmd"]) if ok
           # Delete temporary files
           Dir.glob(@@globals["temp_filename"] + "*").each do |f|
             File.delete(f)

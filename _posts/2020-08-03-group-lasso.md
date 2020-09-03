@@ -96,17 +96,17 @@ digraph G {
         
     subgraph cluster_0 {
         x1[label="$x_1$"] x2[label="$x_2$"];
-        color=white;
+        color=transparent;
     }
 
     subgraph cluster_1 {
         a12 a22 a32 a42;
-        color=white;
+        color=transparent;
     }
 
     subgraph cluster_2 {
         O1[label="$f(x_1, x_2)$"];
-        color=white;
+        color=transparent;
     }
 
     x1 -> a12;
@@ -140,17 +140,17 @@ digraph G {
         
     subgraph cluster_0 {
         x1[label="$x_1$"] x2[label="$x_2$"];
-        color=white;
+        color=transparent;
     }
 
     subgraph cluster_1 {
         a12 a22 a32 a42;
-        color=white;
+        color=transparent;
     }
 
     subgraph cluster_2 {
         O1[label="$f(x_1, x_2)$"];
-        color=white;
+        color=transparent;
     }
 
     x1 -> a12;

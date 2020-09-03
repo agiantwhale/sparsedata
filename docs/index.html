@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://sparsedata.ml/public/css/poole.css">
   <link rel="stylesheet" href="https://sparsedata.ml/public/css/syntax.css">
   <link rel="stylesheet" href="https://sparsedata.ml/public/css/lanyon.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400&display=swap">
 
   <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://sparsedata.ml/public/apple-touch-icon-precomposed.png">
   <link rel="shortcut icon" href="https://sparsedata.ml/public/favicon.ico">
@@ -168,11 +168,11 @@
 
 <p>To visualize this, say we have a small neural network with one hidden layer.</p>
 
-<p><img class="center" src="/latex/latex-9eb9d823f4c04b0dfbf228db0be95161.png" /></p>
+<p><img class="center" src="/latex/latex-c3efb31e3d8abbaee114c46b16b82d97.png" /></p>
 
 <p>In order for the above feature selection to work, we will need to zero out the weights connected for all of feature <img class="inline" src="/latex/latex-81f9067e7235468ca35b473aa81f7687.png" /> (marked in red).</p>
 
-<p><img class="center" src="/latex/latex-7067d5e989ac0f8351e7d89c292f3b68.png" /></p>
+<p><img class="center" src="/latex/latex-db690d40016e4da878ebfe529c17234a.png" /></p>
 
 <p>In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let <img class="inline" src="/latex/latex-ebd0382095ca74bec510b9310b6be292.png" /> and <img class="inline" src="/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png" /> denote the weight vectors for input features <img class="inline" src="/latex/latex-605b40b292da6874f4beb23bc331a715.png" /> and <img class="inline" src="/latex/latex-81f9067e7235468ca35b473aa81f7687.png" /> (<img class="inline" src="/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png" /> weights would be marked in red above). We can adapt the group LASSO regularization formulation as</p>
 
