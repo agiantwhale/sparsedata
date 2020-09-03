@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>SPARSEDATA.ML</title>
+ <link href="http://sparsedata.ml/atom.xml" rel="self"/>
+ <link href="http://sparsedata.ml/"/>
+ <updated>2020-09-03T03:27:46-07:00</updated>
+ <id>http://sparsedata.ml</id>
+ <author>
+   <name>Il Jae Lee</name>
+   <email>agiantwhale@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>Intuitive Explanation of Group LASSO Regularization for Neural Network Interpretability</title>
+   <link href="http://sparsedata.ml/2020/08/03/group-lasso/"/>
+   <updated>2020-08-03T00:00:00-07:00</updated>
+   <id>http://sparsedata.ml/2020/08/03/group-lasso</id>
+   <content type="html">&lt;p&gt;Neural networks are often referred to as a black box model because of its lack of interpretability. Most of a network’s operations occur in the hidden layers and latent space. As a result, tracing important features in a dataset is not an easy task, especially when the number of features is large. This is often a limiting factor in applying neural networks in fields where explainability is not only favored, but crucial (such as medical diagnostics or finance).&lt;/p&gt;
+
+&lt;p&gt;Through this entry, we hope to examine the application of the group LASSO regularization for solving the problems described above.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-ridge-and-lasso-regularization&quot;&gt;What is ridge and LASSO regularization?&lt;/h2&gt;
+&lt;p&gt;The loss function of ridge regression can be defined as&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-faa66a4b2985f120a5a66df452280855.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;while loss function of LASSO regression can be defined as&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-7d8d2ed1b66d7d440e223ec714128e3d.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The above loss functions can be broken down into&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Predicted output: &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-a4f3c67f7c85e4a660c8ae94653e968b.png&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;Regularization term
+    &lt;ul&gt;
+      &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-9b1d5979832b9216d8cb86fa97236628.png&quot; /&gt; for LASSO&lt;/li&gt;
+      &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-089ea0534662bc094f7b486c667a2003.png&quot; /&gt; for ridge&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Comparison of the two regularization terms shows the intuition behind LASSO regression’s better interpretability characteristics. From a Big-O standpoint, &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-37cbe18dfbf7e3197f1294beacc763c7.png&quot; /&gt;. The penalty for having one skewed large value is much greater for ridge regression. Ridge regularization aims to reduce variance between the coefficients, therefore driving all features down to zero.&lt;/p&gt;
+
+&lt;p&gt;LASSO regularization, on the other hand, will set some feature’s coefficients to zero values when deemed necessary, effectively removing them. We then can compare non-zero coefficients to determine the importance of the features.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-group-lasso-regularization&quot;&gt;What is group LASSO regularization?&lt;/h2&gt;
+&lt;p&gt;From the above example, we observe how LASSO regularization can help with the interpretability of the model. But some problems may benefit from a group of features used together, especially when incorporating domain knowledge into the model.&lt;/p&gt;
+
+&lt;p&gt;Group LASSO attempts to solve this problem by separating the entire feature set into separate feature groups. The regularization function can be written as&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-ad590a96e9fcb6bc3ed238f2f79422a8.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;where&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-07c1f0010dc86f2d919b7666dc865bb9.png&quot; /&gt; denotes the size of the group.&lt;/li&gt;
+  &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-7064d17700569250805d168c5f75cef7.png&quot; /&gt; denotes the L2-norm of the feature group &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-0bd43498926fce6f1124d111f4d344b4.png&quot; /&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Let’s take a closer look at the regularization term &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-0800ee6efea5e9bb79950f3ddb609aa2.png&quot; /&gt;.&lt;/p&gt;
+
+&lt;p&gt;Note that &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-07c12a111431708676e4b616cf99b1c4.png&quot; /&gt;, and we for some &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-3423d9f68d3c58eb1c2a7ba2406c8486.png&quot; /&gt; that satisfies &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c928cdd4076c47f86b97795e50736208.png&quot; /&gt;, we could effectively rewrite the equation as&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-daf5bf3707c40aa0822a0583d9b39b58.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In this case, we have effectively reduced the regularization to LASSO regularization on the inter-group level.&lt;/p&gt;
+
+&lt;p&gt;Similarly, let’s take a look an subgroup. Expanding the term for some group with cardinality &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-92890e3f771562f4634e4cc92b907d81.png&quot; /&gt;, the regularization term can be expressed as&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-59bd5f68afe47e2f4f1718ca4a9f88f2.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Here, we have effectively reduced the regularization to ridge regularization on the intra-group level.&lt;/p&gt;
+
+&lt;p&gt;We build on the intuition that while it cannot select certain features within the same group, because of it’s LASSO-like nature between feature groups, the model will zero-out entirety of certain coefficient groups.&lt;/p&gt;
+
+&lt;p&gt;Additionally, note the two following characteristics:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;When &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-6dc2a002fc300a979bda389566ee53a2.png&quot; /&gt;, the regularization term essentially becomes a LASSO (L1) regularization.&lt;/li&gt;
+  &lt;li&gt;When &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-227770dd518db57601bcdae566716f4d.png&quot; /&gt;, the regularization term essentially becomes a ridge (L2) regularization.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;how-can-we-adapt-group-lasso-for-neural-networks&quot;&gt;How can we adapt group LASSO for neural networks?&lt;/h2&gt;
+&lt;p&gt;Up to now, the application of regularization terms have been on linear regression methods where each features are assigned a single coefficient weight. Now, we will take a look at a neural network, specifically on the connections between the first two layer of the network, where each individual features have multiple weights associated to the next layer.&lt;/p&gt;
+
+&lt;p&gt;To visualize this, say we have a small neural network with one hidden layer.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-9eb9d823f4c04b0dfbf228db0be95161.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In order for the above feature selection to work, we will need to zero out the weights connected for all of feature &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-81f9067e7235468ca35b473aa81f7687.png&quot; /&gt; (marked in red).&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-7067d5e989ac0f8351e7d89c292f3b68.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-ebd0382095ca74bec510b9310b6be292.png&quot; /&gt; and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png&quot; /&gt; denote the weight vectors for input features &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-605b40b292da6874f4beb23bc331a715.png&quot; /&gt; and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-81f9067e7235468ca35b473aa81f7687.png&quot; /&gt; (&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png&quot; /&gt; weights would be marked in red above). We can adapt the group LASSO regularization formulation as&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-a6f3531b8c63f968770a840471665dda.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;where &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-a07c1d173c0194d2e4de57138b5509e6.png&quot; /&gt; denotes the loss function and &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-337ead63544f0846525a5b7427f7992b.png&quot; /&gt; denotes the full-connected weights to feature &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-0f29ea2ae0be79f664cc13af8c9bb3d0.png&quot; /&gt;. Since we have two input features, the regularization term would also expand to&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-65cd871842bd245b456933a477a6f33f.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We have essentially derived the Group level lasso regularization on each of the individual features, with the weights corresponding to each feature in a group. We can continue to build on the intuition from the Group LASSO.&lt;/p&gt;
+
+&lt;p&gt;While each individual weights inside a weight group will not differ in terms of convergence to zero (all elements of &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-ebd0382095ca74bec510b9310b6be292.png&quot; /&gt;, &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png&quot; /&gt; will either be zero or non-zero), the non-continuous nature of the l2 norm for individual features will introduce sparsity and converge entire feature weights to 0.&lt;/p&gt;
+
+&lt;p&gt;From here, it’s trivial to apply the same technique to regularizing hidden layers to introduce further sparsity to the model and improve model capacity or prune unneeded connections.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://icml.cc/Conferences/2010/papers/473.pdf&quot;&gt;Yang, Haiqin et al. “Online Learning for Group Lasso.” &lt;em&gt;ICML&lt;/em&gt; (2010).&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/abs/1607.00485&quot;&gt;Scardapane, Simone et al. “Group Sparse Regularization for Deep Neural Networks.” Neurocomputing 241 (2017): 81–89. Crossref. Web.&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+ </entry>
+ 
+
+</feed>
