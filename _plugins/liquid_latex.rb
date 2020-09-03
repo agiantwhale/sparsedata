@@ -83,7 +83,16 @@ module Jekyll
         @p["density"] = @@globals["density"] unless @p.key?("density")
         @p["usepackages"] = (@@globals["usepackages"].split(",") + @p["usepackages"].split(",")).join(",")
         # if this LaTeX code is already compiled, skip its compilation
-        hash_txt = @p["density"].to_s + @p["usepackages"].to_s + latex_source
+        latex_tex = "\\documentclass[preview]{standalone}\n"
+        @p["usepackages"].gsub(" ","").split(",").each do |packagename|
+          latex_tex << "\\usepackage\{#{packagename}\}\n"
+        end
+        latex_tex << "\\usetikzlibrary{shapes,arrows}\n"
+        latex_tex << "\\begin{document}\n\\pagestyle{empty}\n"
+        latex_tex << latex_source
+        latex_tex << "\\end{document}"
+
+        hash_txt = @p["density"].to_s + @p["usepackages"].to_s + latex_tex
         filename = "latex-" + Digest::MD5.hexdigest(hash_txt) + ".png"
         @p["png_fn"] = File.join(@@globals["src_dir"], filename)
         ok = true
@@ -93,14 +102,6 @@ module Jekyll
           @p["pdf_fn"] = @@globals["temp_filename"] + ".pdf"
 
           # Put the LaTeX source code to file
-          latex_tex = "\\documentclass[preview]{standalone}\n"
-          @p["usepackages"].gsub(" ","").split(",").each do |packagename|
-            latex_tex << "\\usepackage\{#{packagename}\}\n"
-          end
-          latex_tex << "\\usetikzlibrary{shapes,arrows}\n"
-          latex_tex << "\\begin{document}\n\\pagestyle{empty}\n"
-          latex_tex << latex_source
-          latex_tex << "\\end{document}"
           tex_file = File.new(@p["tex_fn"], "w")
           tex_file.puts(latex_tex)
           tex_file.close

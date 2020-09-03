@@ -107,24 +107,24 @@
 <h2 id="what-is-ridge-and-lasso-regularization">What is ridge and LASSO regularization?</h2>
 <p>The loss function of ridge regression can be defined as</p>
 
-<p><img class="center" src="/latex/latex-c7c7175b6d0fda1e1560e89d5e35aae7.png" /></p>
+<p><img class="center" src="/latex/latex-b832c44e16abdcd71034eb8a69f73d4f.png" /></p>
 
 <p>while loss function of LASSO regression can be defined as</p>
 
-<p><img class="center" src="/latex/latex-24eaf72a760a8844df4b99b643003ffe.png" /></p>
+<p><img class="center" src="/latex/latex-c706b7933e2425517886943a7c4855dd.png" /></p>
 
 <p>The above loss functions can be broken down into</p>
 <ul>
-  <li>Predicted output: <img class="inline" src="/latex/latex-a4f3c67f7c85e4a660c8ae94653e968b.png" /></li>
+  <li>Predicted output: <img class="inline" src="/latex/latex-1f625f17552856d6463fcac3c32101b3.png" /></li>
   <li>Regularization term
     <ul>
-      <li><img class="inline" src="/latex/latex-9b1d5979832b9216d8cb86fa97236628.png" /> for LASSO</li>
-      <li><img class="inline" src="/latex/latex-089ea0534662bc094f7b486c667a2003.png" /> for ridge</li>
+      <li><img class="inline" src="/latex/latex-c343adb0c473016c19f48b35e9ee1923.png" /> for LASSO</li>
+      <li><img class="inline" src="/latex/latex-fa17a9b380844ff87dc1095a6f843f17.png" /> for ridge</li>
     </ul>
   </li>
 </ul>
 
-<p>Comparison of the two regularization terms shows the intuition behind LASSO regression’s better interpretability characteristics. From a Big-O standpoint, <img class="inline" src="/latex/latex-37cbe18dfbf7e3197f1294beacc763c7.png" />. The penalty for having one skewed large value is much greater for ridge regression. Ridge regularization aims to reduce variance between the coefficients, therefore driving all features down to zero.</p>
+<p>Comparison of the two regularization terms shows the intuition behind LASSO regression’s better interpretability characteristics. From a Big-O standpoint, <img class="inline" src="/latex/latex-f037b2a8bf7aa27b03b3a16f052acd06.png" />. The penalty for having one skewed large value is much greater for ridge regression. Ridge regularization aims to reduce variance between the coefficients, therefore driving all features down to zero.</p>
 
 <p>LASSO regularization, on the other hand, will set some feature’s coefficients to zero values when deemed necessary, effectively removing them. We then can compare non-zero coefficients to determine the importance of the features.</p>
 
@@ -133,25 +133,25 @@
 
 <p>Group LASSO attempts to solve this problem by separating the entire feature set into separate feature groups. The regularization function can be written as</p>
 
-<p><img class="center" src="/latex/latex-27db441fda25ea2ae491cef51821fc3a.png" /></p>
+<p><img class="center" src="/latex/latex-982f81b039618d09108f899cf26f46c5.png" /></p>
 
 <p>where</p>
 <ul>
-  <li><img class="inline" src="/latex/latex-07c1f0010dc86f2d919b7666dc865bb9.png" /> denotes the size of the group.</li>
-  <li><img class="inline" src="/latex/latex-7064d17700569250805d168c5f75cef7.png" /> denotes the L2-norm of the feature group <img class="inline" src="/latex/latex-0bd43498926fce6f1124d111f4d344b4.png" />.</li>
+  <li><img class="inline" src="/latex/latex-10afdb7058d58d26e17462afab5184e1.png" /> denotes the size of the group.</li>
+  <li><img class="inline" src="/latex/latex-1260e71e0fc41670c2fe966156d4aa01.png" /> denotes the L2-norm of the feature group <img class="inline" src="/latex/latex-4322e011bfdf0bfdc4c27891ff3dfc61.png" />.</li>
 </ul>
 
-<p>Let’s take a closer look at the regularization term <img class="inline" src="/latex/latex-0800ee6efea5e9bb79950f3ddb609aa2.png" />.</p>
+<p>Let’s take a closer look at the regularization term <img class="inline" src="/latex/latex-efcb5f9f42d3fc2659fff45d27825d09.png" />.</p>
 
-<p>Note that <img class="inline" src="/latex/latex-07c12a111431708676e4b616cf99b1c4.png" />, and we for some <img class="inline" src="/latex/latex-3423d9f68d3c58eb1c2a7ba2406c8486.png" /> that satisfies <img class="inline" src="/latex/latex-c928cdd4076c47f86b97795e50736208.png" />, we could effectively rewrite the equation as</p>
+<p>Note that <img class="inline" src="/latex/latex-04f7d616922df5bee90be4315df5bd74.png" />, and we for some <img class="inline" src="/latex/latex-3fc4979464ed4d76e333e61e3bd92615.png" /> that satisfies <img class="inline" src="/latex/latex-d9cbfed9c4e18f1438b295b5ed388b2c.png" />, we could effectively rewrite the equation as</p>
 
-<p><img class="center" src="/latex/latex-be060941d7dd8bb1ab1b990ad316c765.png" /></p>
+<p><img class="center" src="/latex/latex-502db40ff96a3f8501db90bbd383a2f1.png" /></p>
 
 <p>In this case, we have effectively reduced the regularization to LASSO regularization on the inter-group level.</p>
 
-<p>Similarly, let’s take a look an subgroup. Expanding the term for some group with cardinality <img class="inline" src="/latex/latex-92890e3f771562f4634e4cc92b907d81.png" />, the regularization term can be expressed as</p>
+<p>Similarly, let’s take a look an subgroup. Expanding the term for some group with cardinality <img class="inline" src="/latex/latex-cf56f66cf006f2f909a26e2840fb3197.png" />, the regularization term can be expressed as</p>
 
-<p><img class="center" src="/latex/latex-e87f42f2e84d0ecdc422bfc61968e45c.png" /></p>
+<p><img class="center" src="/latex/latex-ef2df46f53bb8711bf2f93489981cbfc.png" /></p>
 
 <p>Here, we have effectively reduced the regularization to ridge regularization on the intra-group level.</p>
 
@@ -159,8 +159,8 @@
 
 <p>Additionally, note the two following characteristics:</p>
 <ul>
-  <li>When <img class="inline" src="/latex/latex-6dc2a002fc300a979bda389566ee53a2.png" />, the regularization term essentially becomes a LASSO (L1) regularization.</li>
-  <li>When <img class="inline" src="/latex/latex-227770dd518db57601bcdae566716f4d.png" />, the regularization term essentially becomes a ridge (L2) regularization.</li>
+  <li>When <img class="inline" src="/latex/latex-b509903172b539c1855c10cb08e2b0a9.png" />, the regularization term essentially becomes a LASSO (L1) regularization.</li>
+  <li>When <img class="inline" src="/latex/latex-67dc231cbb67be814d1770bc40e27f66.png" />, the regularization term essentially becomes a ridge (L2) regularization.</li>
 </ul>
 
 <h2 id="how-can-we-adapt-group-lasso-for-neural-networks">How can we adapt group LASSO for neural networks?</h2>
@@ -168,23 +168,23 @@
 
 <p>To visualize this, say we have a small neural network with one hidden layer.</p>
 
-<p><img class="center" src="/latex/latex-c3efb31e3d8abbaee114c46b16b82d97.png" /></p>
+<p><img class="center" src="/latex/latex-676b7e3e942012b08f4761cb52d6598c.png" /></p>
 
-<p>In order for the above feature selection to work, we will need to zero out the weights connected for all of feature <img class="inline" src="/latex/latex-81f9067e7235468ca35b473aa81f7687.png" /> (marked in red).</p>
+<p>In order for the above feature selection to work, we will need to zero out the weights connected for all of feature <img class="inline" src="/latex/latex-63ac1428cb664318e538521970b9c31d.png" /> (marked in red).</p>
 
-<p><img class="center" src="/latex/latex-db690d40016e4da878ebfe529c17234a.png" /></p>
+<p><img class="center" src="/latex/latex-6380075deae1b69a4865b8777a069e99.png" /></p>
 
-<p>In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let <img class="inline" src="/latex/latex-ebd0382095ca74bec510b9310b6be292.png" /> and <img class="inline" src="/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png" /> denote the weight vectors for input features <img class="inline" src="/latex/latex-605b40b292da6874f4beb23bc331a715.png" /> and <img class="inline" src="/latex/latex-81f9067e7235468ca35b473aa81f7687.png" /> (<img class="inline" src="/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png" /> weights would be marked in red above). We can adapt the group LASSO regularization formulation as</p>
+<p>In this case, the weights associated with each of the neurons becomes becomes a group of their own. Let <img class="inline" src="/latex/latex-588e7585b44191d96d5d21a3b0f9d8af.png" /> and <img class="inline" src="/latex/latex-f78c1d7bf8cdc1fa8475ee763ebaa13f.png" /> denote the weight vectors for input features <img class="inline" src="/latex/latex-a61fcbe9f079dadb08038189261d695e.png" /> and <img class="inline" src="/latex/latex-63ac1428cb664318e538521970b9c31d.png" /> (<img class="inline" src="/latex/latex-f78c1d7bf8cdc1fa8475ee763ebaa13f.png" /> weights would be marked in red above). We can adapt the group LASSO regularization formulation as</p>
 
-<p><img class="center" src="/latex/latex-a55892be11cc606dae53876ff19861bc.png" /></p>
+<p><img class="center" src="/latex/latex-ef01b74a4d23c0555bc00ca85c7fcbaa.png" /></p>
 
-<p>where <img class="inline" src="/latex/latex-a07c1d173c0194d2e4de57138b5509e6.png" /> denotes the loss function and <img class="inline" src="/latex/latex-337ead63544f0846525a5b7427f7992b.png" /> denotes the full-connected weights to feature <img class="inline" src="/latex/latex-0f29ea2ae0be79f664cc13af8c9bb3d0.png" />. Since we have two input features, the regularization term would also expand to</p>
+<p>where <img class="inline" src="/latex/latex-ad4c0ceaad058aef6ccf3e724ca12b9a.png" /> denotes the loss function and <img class="inline" src="/latex/latex-3035883f6531462455e562d330180152.png" /> denotes the full-connected weights to feature <img class="inline" src="/latex/latex-7bdce1f20016bc5e7197ccbbb0a86fab.png" />. Since we have two input features, the regularization term would also expand to</p>
 
-<p><img class="center" src="/latex/latex-ec39141da2aca3d8c8e14e5915368473.png" /></p>
+<p><img class="center" src="/latex/latex-987cc3e980a19372984ddcd977ea3a9a.png" /></p>
 
 <p>We have essentially derived the Group level lasso regularization on each of the individual features, with the weights corresponding to each feature in a group. We can continue to build on the intuition from the Group LASSO.</p>
 
-<p>While each individual weights inside a weight group will not differ in terms of convergence to zero (all elements of <img class="inline" src="/latex/latex-ebd0382095ca74bec510b9310b6be292.png" />, <img class="inline" src="/latex/latex-f9a998cb725534032b0bd6c14cbc1d0d.png" /> will either be zero or non-zero), the non-continuous nature of the l2 norm for individual features will introduce sparsity and converge entire feature weights to 0.</p>
+<p>While each individual weights inside a weight group will not differ in terms of convergence to zero (all elements of <img class="inline" src="/latex/latex-588e7585b44191d96d5d21a3b0f9d8af.png" />, <img class="inline" src="/latex/latex-f78c1d7bf8cdc1fa8475ee763ebaa13f.png" /> will either be zero or non-zero), the non-continuous nature of the l2 norm for individual features will introduce sparsity and converge entire feature weights to 0.</p>
 
 <p>From here, it’s trivial to apply the same technique to regularizing hidden layers to introduce further sparsity to the model and improve model capacity or prune unneeded connections.</p>
 
