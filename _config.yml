@@ -18,6 +18,11 @@ author:
   url:               https://sparsedata.ml
   email:             agiantwhale@gmail.com
 
+# Assets
+assets:
+  sources:
+    - _assets/
+
 # Gems
 plugins:
   - jekyll-paginate
