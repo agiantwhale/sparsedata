@@ -3,9 +3,17 @@ layout: page
 title: About
 show_title: false
 ---
-![Machine Learning](https://imgs.xkcd.com/comics/machine_learning.png)
+![Bayes](https://imgs.xkcd.com/comics/modified_bayes_theorem.png)
 
-### Il Jae Lee
+Greetings,
+
+My name is Jae, a machine learning enthusiast and practitioner. This is a little corner of the internet where I write about various topics related to machine learning, statistics and uncertainty.
+
+While I aim to explain ideas clearly, it is possible for my wording to be confusing or even outright erroneous. If you observe such case, please get in touch with me and I will try to rectify the mistake.
+
+*Opinions expressed are solely my own and do not express the views or opinions of my employer.*
+
+### Author
 * Programmer with special interests in distributed and intelligent systems.
 * Currently working on contents understanding, Newsfeed ranking & recommendation problems at [Facebook](https://engineering.fb.com/).
 * Previously worked at [SalesforceIQ](https://engineering.salesforce.com/) and [Fountain](https://get.fountain.com/).
