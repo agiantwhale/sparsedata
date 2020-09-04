@@ -11,6 +11,8 @@ My name is Jae, a machine learning enthusiast and practitioner. This is a little
 
 While I aim to explain ideas clearly, it is possible for my wording to be confusing or even outright erroneous. If you observe such case, please get in touch with me and I will try to rectify the mistake.
 
+This blog is open source. The code is [here](https://github.com/agiantwhale/sparsedata). Feel free to submit a pull request if you see potential improvements.
+
 *Opinions expressed are solely my own and do not express the views or opinions of my employer.*
 
 ### Author
