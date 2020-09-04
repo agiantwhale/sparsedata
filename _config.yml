@@ -1,7 +1,7 @@
 # Setup
 title:               SPARSEDATA.ML
 tagline:             'thinking machines'
-description:         'On machine learning & statistics'
+description:         'A blog on machine learning, probabilistic methods and intelligent systems.'
 url:                 https://sparsedata.ml
 baseurl:             ''
 paginate:            5

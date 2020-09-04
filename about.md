@@ -7,7 +7,7 @@ show_title: false
 
 Greetings,
 
-My name is Jae, a machine learning enthusiast and practitioner. This is a little corner of the internet where I write about various topics related to machine learning, statistics and uncertainty.
+My name is Jae, a machine learning enthusiast and practitioner. This is a little corner of the internet where I write about various topics related to machine learning, probabilitics methods and uncertainty.
 
 While I aim to explain ideas clearly, it is possible for my wording to be confusing or even outright erroneous. If you observe such case, please get in touch with me and I will try to rectify the mistake.
 
