@@ -6,6 +6,7 @@ url:                 https://sparsedata.ml
 baseurl:             ''
 paginate:            5
 permalink:           pretty
+destination:         docs/
 
 # Liquid latex
 liquid_latex:
