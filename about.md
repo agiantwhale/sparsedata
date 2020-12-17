@@ -3,16 +3,6 @@ layout: page
 title: About
 show_title: false
 ---
-![Bayes](https://imgs.xkcd.com/comics/modified_bayes_theorem.png)
-
-Greetings,
-
-My name is Jae, a machine learning enthusiast and practitioner. This is a little corner of the internet where I write about various topics related to machine learning, probabilitics methods and uncertainty.
-
-While I aim to explain ideas clearly, it is possible for my wording to be confusing or even outright erroneous. If you observe such case, please get in touch with me and I will try to rectify the mistake.
-
-This blog is open source. The code is [here](https://github.com/agiantwhale/sparsedata). Feel free to submit a pull request if you see potential improvements.
-
 *Opinions expressed are solely my own and do not express the views or opinions of my employer.*
 
 ### Author
