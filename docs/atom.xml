@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
- <title>SPARSEDATA.ML</title>
- <link href="https://sparsedata.ml/atom.xml" rel="self"/>
- <link href="https://sparsedata.ml/"/>
- <updated>2020-12-16T20:55:22-08:00</updated>
- <id>https://sparsedata.ml</id>
+ <title>tensor.blog</title>
+ <link href="https://tensor.blog/atom.xml" rel="self"/>
+ <link href="https://tensor.blog/"/>
+ <updated>2021-01-12T18:41:11-08:00</updated>
+ <id>https://tensor.blog</id>
  <author>
    <name>Il Jae Lee</name>
    <email>agiantwhale@gmail.com</email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Intuitive Explanation of Group LASSO Regularization for Neural Network Interpretability</title>
-   <link href="https://sparsedata.ml/2020/08/03/group-lasso/"/>
+   <link href="https://tensor.blog/2020/08/03/group-lasso/"/>
    <updated>2020-08-03T00:00:00-07:00</updated>
-   <id>https://sparsedata.ml/2020/08/03/group-lasso</id>
+   <id>https://tensor.blog/2020/08/03/group-lasso</id>
    <content type="html">&lt;p&gt;Neural networks are often referred to as a black box model because of its lack of interpretability. Most of a network’s operations occur in the hidden layers and latent space. As a result, tracing important features in a dataset is not an easy task, especially when the number of features is large. This is often a limiting factor in applying neural networks in fields where explainability is not only favored, but crucial (such as medical diagnostics or finance).&lt;/p&gt;
 
 &lt;p&gt;Through this entry, we hope to examine the application of the group LASSO regularization for solving the problems described above.&lt;/p&gt;

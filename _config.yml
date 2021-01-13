@@ -1,8 +1,8 @@
 # Setup
-title:               SPARSEDATA.ML
+title:               tensor.blog
 tagline:             'thinking machines'
 description:         'A blog on machine learning, probabilistic methods and intelligent systems.'
-url:                 https://sparsedata.ml
+url:                 https://tensor.blog
 baseurl:             ''
 paginate:            5
 permalink:           pretty
@@ -16,7 +16,7 @@ liquid_latex:
 # About/contact
 author:
   name:              Il Jae Lee
-  url:               https://sparsedata.ml
+  url:               https://tensor.blog
   email:             agiantwhale@gmail.com
 
 # Assets
