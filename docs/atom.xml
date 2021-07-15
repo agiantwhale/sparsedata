@@ -4,7 +4,7 @@
  <title>tensor.blog</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2021-07-15T12:34:14-07:00</updated>
+ <updated>2021-07-15T13:30:00-07:00</updated>
  <id>http://localhost:4000</id>
  <author>
    <name>Il Jae Lee</name>
@@ -51,9 +51,9 @@
 &lt;p&gt;I’m relying on HuggingFace’s Transformer library to train the model on Google Colab’s TPUs. I ran into several problems, which I mostly fixed by copy-paste engineering and customizing to suit my needs:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;HuggingFace’s Trainer (as of v4.8.2) does not support exporting multiple losses. The final optimization loss is the weighted sum of two tasks: &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-367d42f5b8fcd77a92884b4b71726667.png&quot; /&gt;, but for final evaluation we only care about the language modeling task (&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-6c9c382af2e89e83ff13a592ab81e473.png&quot; /&gt;). A quick hack to report all three loss is in the code implementation &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/fbgpt/trainer.py&quot;&gt;here&lt;/a&gt;.&lt;/li&gt;
   &lt;li&gt;Training on TPU (using &lt;a href=&quot;https://github.com/pytorch/xla&quot;&gt;pytorch/xla&lt;/a&gt;) requires fixed tensor sizes for speed up. This requires some additional care on preprocessing the data part (see block size optimization on parameter tuning section below). I assume this is due to TPU internally optimizing the memory layout.&lt;/li&gt;
-  &lt;li&gt;DialoGPT was trained without using token IDs.&lt;/li&gt;
+  &lt;li&gt;HuggingFace’s Trainer (as of v4.8.2) does not support exporting multiple losses. The final optimization loss is the weighted sum of two tasks: language modeling and next sentence classification, but for final evaluation we only care about the language modeling task. A quick hack to report all three loss is in the code implementation &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/fbgpt/trainer.py&quot;&gt;here&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;DialoGPT was trained without using token IDs, as a special boolean mask to indicate whether a sentence is a reply or not.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;The following sections describe the parameter tuning explorations.&lt;/p&gt;
@@ -63,12 +63,14 @@
 
 &lt;p&gt;&lt;img src=&quot;/assets/jaegpt/block_size.png&quot; alt=&quot;GPT2 Double Head Model Design&quot; /&gt;&lt;/p&gt;
 
+&lt;p&gt;I’ve updated the data processing step to pad the data to become a fixed width of 128 and ignore rows that overflow – we are good to go.&lt;/p&gt;
+
 &lt;h3 id=&quot;epoch&quot;&gt;Epoch&lt;/h3&gt;
 &lt;p&gt;I kicked off an exploratory run with epoch of 4 to see if multi-epoch training is even reasonable. Small dataset, large model size and sparse tokens seems like a recipe for overfitting, so I chose a batch size of 1 TPU (which gives us an update batch size of 8, as there are 8 TPU cores). Next sentence prediction task was not used in this run.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/jaegpt/epoch_tune.png&quot; alt=&quot;Train vs Eval in Epoch 4&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;We seem to overfit after 1 epoch. The other runs were trained using a single epoch.&lt;/p&gt;
+&lt;p&gt;We seem to overfit after 1 epoch. The remainder runs in this post were trained using a single epoch.&lt;/p&gt;
 
 &lt;h3 id=&quot;task-weight-exploration&quot;&gt;Task weight exploration&lt;/h3&gt;
 
@@ -77,6 +79,10 @@
 &lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-7b1b14389b8ed1593e58412ea7b2d214.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The background entropy for language modeling task is 7.8 times higher than next sentence prediction! A 50% reduction in the classification task would be considered only a 7% reduction in the language modeling task in the final loss function.&lt;/p&gt;
+
+&lt;p&gt;The final loss function is formulaized as&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-d91e79dee13c6be43f63c0e6011afb9e.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;To verify the potential improvements, I tuned the &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt; in the combined loss to the following values. Reported metrics are eval metrics.&lt;/p&gt;
 
@@ -88,6 +94,7 @@
       &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-810c648c5a616153702c17cba3428550.png&quot; /&gt;&lt;/th&gt;
       &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-6c9c382af2e89e83ff13a592ab81e473.png&quot; /&gt;&lt;/th&gt;
       &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-18fb601c4ccd970049908cca46af8ff2.png&quot; /&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-51e1008cf65efc66bd2ed2b87fc292f3.png&quot; /&gt;&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
@@ -97,6 +104,7 @@
       &lt;td&gt;1.312&lt;/td&gt;
       &lt;td&gt;7.814&lt;/td&gt;
       &lt;td&gt;0.722&lt;/td&gt;
+      &lt;td&gt;&lt;strong&gt;0.0014&lt;/strong&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;10&lt;/td&gt;
@@ -104,6 +112,7 @@
       &lt;td&gt;0.958&lt;/td&gt;
       &lt;td&gt;5.229&lt;/td&gt;
       &lt;td&gt;0.483&lt;/td&gt;
+      &lt;td&gt;0.0012&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;1&lt;/td&gt;
@@ -111,6 +120,7 @@
       &lt;td&gt;&lt;strong&gt;0.767&lt;/strong&gt;&lt;/td&gt;
       &lt;td&gt;4.503&lt;/td&gt;
       &lt;td&gt;0.415&lt;/td&gt;
+      &lt;td&gt;0.0002&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;0.1&lt;/td&gt;
@@ -118,6 +128,7 @@
       &lt;td&gt;0.956&lt;/td&gt;
       &lt;td&gt;4.365&lt;/td&gt;
       &lt;td&gt;0.403&lt;/td&gt;
+      &lt;td&gt;0.0002&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;0.01&lt;/td&gt;
@@ -125,6 +136,7 @@
       &lt;td&gt;0.999&lt;/td&gt;
       &lt;td&gt;&lt;strong&gt;4.361&lt;/strong&gt;&lt;/td&gt;
       &lt;td&gt;&lt;strong&gt;0.402&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;0.0001&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
@@ -137,14 +149,14 @@
 
 &lt;p&gt;&lt;img src=&quot;/assets/jaegpt/acc.png&quot; alt=&quot;Eval Accuracy&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Surprisingly, the inclusion of supervision tasks increase the LM modeling accuracy. However this isn’t a good metric to optimize for, as we will be using beam search to generate responses through sampling; learning an accurate distribution of next token is more important than predicting the most likely token.&lt;/p&gt;
+&lt;p&gt;In constract to &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-6c9c382af2e89e83ff13a592ab81e473.png&quot; /&gt;, the inclusion of supervision tasks increase the LM modeling accuracy. However this isn’t a good metric to optimize for, as we will be using beam search to generate responses through sampling; learning an accurate distribution of next token is more important than predicting the most likely token.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/jaegpt/mc_loss.png&quot; alt=&quot;Eval MC Loss&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Increasing the &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt; parameter does not result in linear increase to MC loss, with &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f6fbad6a2333abe8d09954cff4137205.png&quot; /&gt; being the optimal state. I couldn’t think of a reasonable explanation for this; my guess is it has to do with steep gradient magnitudes with higher &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt;; plotting magnitude of gradient might give us a better idea here.&lt;/p&gt;
+&lt;p&gt;Increasing the &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt; parameter does not result in linear increase to MC loss, with &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f6fbad6a2333abe8d09954cff4137205.png&quot; /&gt; showing the best result. In fact, a multiplier of 100 shows a worse result than random guess! I couldn’t think of a reasonable explanation for this; my guess is it has to do with steep gradient magnitudes with higher &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt;; plotting magnitude of gradient might give us a better idea here.&lt;/p&gt;
 
 &lt;h3 id=&quot;bayes-hyperparameter-optimization&quot;&gt;Bayes hyperparameter optimization&lt;/h3&gt;
-&lt;p&gt;We did some initial exploration of model architectures; now let’s try optimize the model to get the best candidate.&lt;/p&gt;
+&lt;p&gt;We did some initial exploration of model architectures; now let’s systematically explore the entire search space to get the best candidate. To do this, we utilize &lt;a href=&quot;https://github.com/wandb/client/tree/master/wandb/sweeps&quot;&gt;Weights &amp;amp; Biases’ excellent sweep utility&lt;/a&gt;, with the &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/search.yml&quot;&gt;config&lt;/a&gt; tuned to search the MC task weight and the learning rate. The sweep was done on a GPU instance as I ran into some issues with TPU process hanging, so with a batch size of 1.&lt;/p&gt;
 
 &lt;h2 id=&quot;conversation-examples&quot;&gt;Conversation examples&lt;/h2&gt;
 </content>
