@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>tensor.blog</title>
- <link href="https://tensor.blog/atom.xml" rel="self"/>
- <link href="https://tensor.blog/"/>
- <updated>2021-01-12T18:41:11-08:00</updated>
- <id>https://tensor.blog</id>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000/"/>
+ <updated>2021-07-15T12:34:14-07:00</updated>
+ <id>http://localhost:4000</id>
  <author>
    <name>Il Jae Lee</name>
    <email>agiantwhale@gmail.com</email>
@@ -13,10 +13,148 @@
 
  
  <entry>
+   <title>Talking to myself using GPT</title>
+   <link href="http://localhost:4000/2021/07/14/jaegpt/"/>
+   <updated>2021-07-14T00:00:00-07:00</updated>
+   <id>http://localhost:4000/2021/07/14/jaegpt</id>
+   <content type="html">&lt;p&gt;Transformer &amp;amp; attention models are all the hype in the machine learning community recently, so I took sometime to learn about them. As a fun project, I’ve decided to build a virtual version of myself (now I will finally have a friend to talk to!).&lt;/p&gt;
+
+&lt;h2 id=&quot;data-preparation&quot;&gt;Data preparation&lt;/h2&gt;
+&lt;p&gt;The training data was prepared through &lt;a href=&quot;https://www.facebook.com/dyi/&quot;&gt;downloading my entire Facebook chat history&lt;/a&gt;, and using a &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/build_dataset.py&quot;&gt;parsing script&lt;/a&gt; I wrote. There’s a couple of gotchas when it comes to parsing Facebook messages data:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Ignore chat threads where most of the language is non-English (Korean is my first language).&lt;/li&gt;
+  &lt;li&gt;Remove automated messages (A lot of &lt;em&gt;Words With Friends&lt;/em&gt; requests).&lt;/li&gt;
+  &lt;li&gt;Combine consecutive messages into a single sentence.&lt;/li&gt;
+  &lt;li&gt;Set a threshold to yield a new context (I’ve chosen this as 50th percentile of message time delta).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Overall, the preparation pipeline looks as follows:
+&lt;img src=&quot;/assets/jaegpt/data_gen.png&quot; alt=&quot;GPT Data Generation Pipeline&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The context of the model is preceding 4 messages before my reply. 3 distractors are chosen from the sent replies in the current chat for the supervision task. I haven’t investigated the effects of these two parameter choices – tuning these context and distractor parameters could be an interesting study.&lt;/p&gt;
+
+&lt;p&gt;The final dataset yields 29192 lines and is 11MB. I’ve split as 25000 lines as training set and the rest 4192 lines as the validation set. This is a fraction of the amount of data the baseline model was trained on (&lt;a href=&quot;https://github.com/microsoft/DialoGPT&quot;&gt;DialoGPT was trained on 147M multi-turn dialogue from Reddit&lt;/a&gt;). Regardless, I found that I was able to get reasonable results with these small datasets.&lt;/p&gt;
+
+&lt;p&gt;Here is the final objective distribution that we aim to model.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-1130b28c21c2a95b5536f6c7eb3bc1f6.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;model-architecture&quot;&gt;Model architecture&lt;/h2&gt;
+&lt;p&gt;The architecture is taken directly from the &lt;a href=&quot;https://medium.com/huggingface/how-to-build-a-state-of-the-art-conversational-ai-with-transfer-learning-2d818ac26313&quot;&gt;HuggingFace’s ConvAI2 (NeurIPS 2018) winning model&lt;/a&gt;. The language modeling head is making the actual token predictions, with an extra next sentence classification head added on to the hidden states of the last token to discriminate between the correct reply and a negatively sampled reply. Refer to the linked blogpost and the code for details – the transformer network (and attention module) is a fascinating piece of work that deserves close… &lt;em&gt;attention&lt;/em&gt;. For the sake of this post, you can think of the attention module as learning a masking function that focuses on each word in a given sentence (in a &lt;em&gt;fill-in-the-blank&lt;/em&gt; manner).&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/model_design.png&quot; alt=&quot;GPT2 Double Head Model Design&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It seems the discriminator head is designed to act as a weak supervision function to aid language modeling task (through cross learning), but &lt;strong&gt;I didn’t notice any noticable improvements to the main LM task without it.&lt;/strong&gt; More details in the following sections.&lt;/p&gt;
+
+&lt;h2 id=&quot;training-implementation&quot;&gt;Training implementation&lt;/h2&gt;
+&lt;p&gt;I’m relying on HuggingFace’s Transformer library to train the model on Google Colab’s TPUs. I ran into several problems, which I mostly fixed by copy-paste engineering and customizing to suit my needs:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;HuggingFace’s Trainer (as of v4.8.2) does not support exporting multiple losses. The final optimization loss is the weighted sum of two tasks: &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-367d42f5b8fcd77a92884b4b71726667.png&quot; /&gt;, but for final evaluation we only care about the language modeling task (&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-6c9c382af2e89e83ff13a592ab81e473.png&quot; /&gt;). A quick hack to report all three loss is in the code implementation &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/fbgpt/trainer.py&quot;&gt;here&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;Training on TPU (using &lt;a href=&quot;https://github.com/pytorch/xla&quot;&gt;pytorch/xla&lt;/a&gt;) requires fixed tensor sizes for speed up. This requires some additional care on preprocessing the data part (see block size optimization on parameter tuning section below). I assume this is due to TPU internally optimizing the memory layout.&lt;/li&gt;
+  &lt;li&gt;DialoGPT was trained without using token IDs.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The following sections describe the parameter tuning explorations.&lt;/p&gt;
+
+&lt;h3 id=&quot;block-size&quot;&gt;Block size&lt;/h3&gt;
+&lt;p&gt;This is to resolve the fixed tensor requirement with the TPU above. I wrote a script to calculate percentage of training rows that go above limit at each tokenization step. From the chart below, it seems we get a 99% yield with block size of &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-e0afb0c7a5e6c6ec867e9bbea08b6b10.png&quot; /&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/block_size.png&quot; alt=&quot;GPT2 Double Head Model Design&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;epoch&quot;&gt;Epoch&lt;/h3&gt;
+&lt;p&gt;I kicked off an exploratory run with epoch of 4 to see if multi-epoch training is even reasonable. Small dataset, large model size and sparse tokens seems like a recipe for overfitting, so I chose a batch size of 1 TPU (which gives us an update batch size of 8, as there are 8 TPU cores). Next sentence prediction task was not used in this run.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/epoch_tune.png&quot; alt=&quot;Train vs Eval in Epoch 4&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We seem to overfit after 1 epoch. The other runs were trained using a single epoch.&lt;/p&gt;
+
+&lt;h3 id=&quot;task-weight-exploration&quot;&gt;Task weight exploration&lt;/h3&gt;
+
+&lt;p&gt;For a baseline, below is the entropy of a background predictors that generate a random choice for the two tasks. The DialoGPT tokenizer contains 50257 tokens, and we choose 3 distractors for the next sentence prediction tasks.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-7b1b14389b8ed1593e58412ea7b2d214.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The background entropy for language modeling task is 7.8 times higher than next sentence prediction! A 50% reduction in the classification task would be considered only a 7% reduction in the language modeling task in the final loss function.&lt;/p&gt;
+
+&lt;p&gt;To verify the potential improvements, I tuned the &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt; in the combined loss to the following values. Reported metrics are eval metrics.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-480ff5082f729e253113a042a6c9bbac.png&quot; /&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-810c648c5a616153702c17cba3428550.png&quot; /&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-6c9c382af2e89e83ff13a592ab81e473.png&quot; /&gt;&lt;/th&gt;
+      &lt;th&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-18fb601c4ccd970049908cca46af8ff2.png&quot; /&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;100&lt;/td&gt;
+      &lt;td&gt;1.819&lt;/td&gt;
+      &lt;td&gt;1.312&lt;/td&gt;
+      &lt;td&gt;7.814&lt;/td&gt;
+      &lt;td&gt;0.722&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;10&lt;/td&gt;
+      &lt;td&gt;1.328&lt;/td&gt;
+      &lt;td&gt;0.958&lt;/td&gt;
+      &lt;td&gt;5.229&lt;/td&gt;
+      &lt;td&gt;0.483&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;&lt;strong&gt;1.063&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;strong&gt;0.767&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;4.503&lt;/td&gt;
+      &lt;td&gt;0.415&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;0.1&lt;/td&gt;
+      &lt;td&gt;1.325&lt;/td&gt;
+      &lt;td&gt;0.956&lt;/td&gt;
+      &lt;td&gt;4.365&lt;/td&gt;
+      &lt;td&gt;0.403&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;0.01&lt;/td&gt;
+      &lt;td&gt;1.386&lt;/td&gt;
+      &lt;td&gt;0.999&lt;/td&gt;
+      &lt;td&gt;&lt;strong&gt;4.361&lt;/strong&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;strong&gt;0.402&lt;/strong&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;And their corresponding learning curves:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/lm_loss.png&quot; alt=&quot;Eval LM Loss&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Using the supervision tasks shows minimal improvement to the main LM loss; rather makes it worse.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/acc.png&quot; alt=&quot;Eval Accuracy&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Surprisingly, the inclusion of supervision tasks increase the LM modeling accuracy. However this isn’t a good metric to optimize for, as we will be using beam search to generate responses through sampling; learning an accurate distribution of next token is more important than predicting the most likely token.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/mc_loss.png&quot; alt=&quot;Eval MC Loss&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Increasing the &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt; parameter does not result in linear increase to MC loss, with &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f6fbad6a2333abe8d09954cff4137205.png&quot; /&gt; being the optimal state. I couldn’t think of a reasonable explanation for this; my guess is it has to do with steep gradient magnitudes with higher &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt;; plotting magnitude of gradient might give us a better idea here.&lt;/p&gt;
+
+&lt;h3 id=&quot;bayes-hyperparameter-optimization&quot;&gt;Bayes hyperparameter optimization&lt;/h3&gt;
+&lt;p&gt;We did some initial exploration of model architectures; now let’s try optimize the model to get the best candidate.&lt;/p&gt;
+
+&lt;h2 id=&quot;conversation-examples&quot;&gt;Conversation examples&lt;/h2&gt;
+</content>
+ </entry>
+ 
+ <entry>
    <title>Intuitive Explanation of Group LASSO Regularization for Neural Network Interpretability</title>
-   <link href="https://tensor.blog/2020/08/03/group-lasso/"/>
+   <link href="http://localhost:4000/2020/08/03/group-lasso/"/>
    <updated>2020-08-03T00:00:00-07:00</updated>
-   <id>https://tensor.blog/2020/08/03/group-lasso</id>
+   <id>http://localhost:4000/2020/08/03/group-lasso</id>
    <content type="html">&lt;p&gt;Neural networks are often referred to as a black box model because of its lack of interpretability. Most of a network’s operations occur in the hidden layers and latent space. As a result, tracing important features in a dataset is not an easy task, especially when the number of features is large. This is often a limiting factor in applying neural networks in fields where explainability is not only favored, but crucial (such as medical diagnostics or finance).&lt;/p&gt;
 
 &lt;p&gt;Through this entry, we hope to examine the application of the group LASSO regularization for solving the problems described above.&lt;/p&gt;
