@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>tensor.blog</title>
- <link href="http://localhost:4000/atom.xml" rel="self"/>
- <link href="http://localhost:4000/"/>
- <updated>2021-07-19T15:48:57-07:00</updated>
- <id>http://localhost:4000</id>
+ <link href="https://tensor.blog/atom.xml" rel="self"/>
+ <link href="https://tensor.blog/"/>
+ <updated>2021-07-19T15:51:16-07:00</updated>
+ <id>https://tensor.blog</id>
  <author>
    <name>Il Jae Lee</name>
    <email>agiantwhale@gmail.com</email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Talking to myself using GPT</title>
-   <link href="http://localhost:4000/2021/07/14/jaegpt/"/>
+   <link href="https://tensor.blog/2021/07/14/jaegpt/"/>
    <updated>2021-07-14T00:00:00-07:00</updated>
-   <id>http://localhost:4000/2021/07/14/jaegpt</id>
+   <id>https://tensor.blog/2021/07/14/jaegpt</id>
    <content type="html">&lt;p&gt;Transformer &amp;amp; attention models are all the hype in the machine learning community recently, so I took sometime to learn about them. As a fun project, I’ve decided to build a virtual version of myself (now I will finally have a friend to talk to!).&lt;/p&gt;
 
 &lt;h2 id=&quot;data-preparation&quot;&gt;Data preparation&lt;/h2&gt;
@@ -583,9 +583,9 @@ JaeGPT: I'm going to be a billionaire from a millionaire I'm going into a billio
  
  <entry>
    <title>Intuitive Explanation of Group LASSO Regularization for Neural Network Interpretability</title>
-   <link href="http://localhost:4000/2020/08/03/group-lasso/"/>
+   <link href="https://tensor.blog/2020/08/03/group-lasso/"/>
    <updated>2020-08-03T00:00:00-07:00</updated>
-   <id>http://localhost:4000/2020/08/03/group-lasso</id>
+   <id>https://tensor.blog/2020/08/03/group-lasso</id>
    <content type="html">&lt;p&gt;Neural networks are often referred to as a black box model because of its lack of interpretability. Most of a network’s operations occur in the hidden layers and latent space. As a result, tracing important features in a dataset is not an easy task, especially when the number of features is large. This is often a limiting factor in applying neural networks in fields where explainability is not only favored, but crucial (such as medical diagnostics or finance).&lt;/p&gt;
 
 &lt;p&gt;Through this entry, we hope to examine the application of the group LASSO regularization for solving the problems described above.&lt;/p&gt;
