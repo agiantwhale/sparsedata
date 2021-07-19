@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
- <title>tensor.blog</title>
+ <title>Explorations in ML</title>
  <link href="https://tensor.blog/atom.xml" rel="self"/>
  <link href="https://tensor.blog/"/>
- <updated>2021-07-19T15:51:16-07:00</updated>
+ <updated>2021-07-19T16:44:21-07:00</updated>
  <id>https://tensor.blog</id>
  <author>
    <name>Il Jae Lee</name>
@@ -17,7 +17,7 @@
    <link href="https://tensor.blog/2021/07/14/jaegpt/"/>
    <updated>2021-07-14T00:00:00-07:00</updated>
    <id>https://tensor.blog/2021/07/14/jaegpt</id>
-   <content type="html">&lt;p&gt;Transformer &amp;amp; attention models are all the hype in the machine learning community recently, so I took sometime to learn about them. As a fun project, I’ve decided to build a virtual version of myself (now I will finally have a friend to talk to!).&lt;/p&gt;
+   <content type="html">&lt;p&gt;Transformer &amp;amp; attention models are all the hype in the machine learning community recently, so I took sometime to learn about them. As a fun project, I’ve decided to build a virtual version of myself (thanks to trove of dataset from Facebook messenger export).&lt;/p&gt;
 
 &lt;h2 id=&quot;data-preparation&quot;&gt;Data preparation&lt;/h2&gt;
 &lt;p&gt;The training data was prepared through &lt;a href=&quot;https://www.facebook.com/dyi/&quot;&gt;downloading my entire Facebook chat history&lt;/a&gt;, and using a &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/build_dataset.py&quot;&gt;parsing script&lt;/a&gt; I wrote. There’s a couple of gotchas when it comes to parsing Facebook messages data:&lt;/p&gt;
@@ -575,6 +575,72 @@ JaeGPT: I want a billionaire to live a long life so I can be a millionaire again
 
 &amp;gt;&amp;gt;&amp;gt; You're going to become a millionaire from a billionaire?
 JaeGPT: I'm going to be a billionaire from a millionaire I'm going into a billionaire I'm not going
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;jae-gpt-on-living-in-korea&quot;&gt;Jae-GPT on living in Korea.&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Would you ever move back to Korea?
+JaeGPT: I'm not sure, I'm not a big fan of the culture there, I think I'll
+
+
+
+&amp;gt;&amp;gt;&amp;gt; What don't you like about the culture?
+JaeGPT: The culture is pretty chill, but I'm kinda scared of the people I met there lol. I
+
+
+
+&amp;gt;&amp;gt;&amp;gt; You are scared of Koreans?
+JaeGPT: I'm scared of Asians too. I'm scared to be interviewed there lolololol. I
+
+
+
+&amp;gt;&amp;gt;&amp;gt; That's interesting since you are Korean.
+JaeGPT: I don't think I'll be applying to any of the big tech companies in Korea lol. They
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;jae-gpt-on-his-delusions-on-the-housing-market&quot;&gt;Jae-GPT on his delusions on the housing market.&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Got any good stock picks?
+JaeGPT: I'm thinking of buying a house in SF for $200, but I'm not sure yet.
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Wow! That's an amazing deal. Where?
+JaeGPT: San Mateo! It's a pretty small place but I think it's worth it. I'm
+
+
+
+&amp;gt;&amp;gt;&amp;gt; $200! Are you sure it's not a cardboard box on the streets?
+JaeGPT: I'm not too sure, I'll ask my friend who's living in SF and ask if he
+
+
+
+&amp;gt;&amp;gt;&amp;gt; You should do more background research.
+JaeGPT: I've been thinking about getting a job at a startup in SF for the past couple of years.
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Are you sure that will pay for the house?
+JaeGPT: I'm thinking of moving to SF, but I'm not sure if I can get a job there
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;jae-gpt-on-gaming-pc-is-worth-it&quot;&gt;Jae-GPT on gaming PC is worth it.&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Is a gaming PC worth it
+JaeGPT: I don't think so But I'm not sure if it's worth it to buy a gaming computer
+
+
+
+&amp;gt;&amp;gt;&amp;gt; But you can play TF2 on full options
+JaeGPT: I'm not buying a gaming pc for gaming lol I'm buying a laptop for gaming and gaming lol
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Laptop for gaming sucks
+JaeGPT: I have a gaming PC and I can play tf2 on it lol I can't play TF1
 
 
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
