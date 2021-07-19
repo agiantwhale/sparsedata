@@ -3,6 +3,8 @@ layout: page
 title: About
 show_title: false
 ---
+Hello, I'm Il Jae. Welcome to my blog.
+
 *Opinions expressed are solely my own and do not express the views or opinions of my employer.*
 
 ### Author

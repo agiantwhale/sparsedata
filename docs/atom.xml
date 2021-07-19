@@ -4,7 +4,7 @@
  <title>tensor.blog</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2021-07-15T13:30:00-07:00</updated>
+ <updated>2021-07-19T15:48:57-07:00</updated>
  <id>http://localhost:4000</id>
  <author>
    <name>Il Jae Lee</name>
@@ -24,7 +24,7 @@
 
 &lt;ul&gt;
   &lt;li&gt;Ignore chat threads where most of the language is non-English (Korean is my first language).&lt;/li&gt;
-  &lt;li&gt;Remove automated messages (A lot of &lt;em&gt;Words With Friends&lt;/em&gt; requests).&lt;/li&gt;
+  &lt;li&gt;Remove automated messages (Eg: &lt;em&gt;Words With Friends&lt;/em&gt; game requests).&lt;/li&gt;
   &lt;li&gt;Combine consecutive messages into a single sentence.&lt;/li&gt;
   &lt;li&gt;Set a threshold to yield a new context (I’ve chosen this as 50th percentile of message time delta).&lt;/li&gt;
 &lt;/ul&gt;
@@ -36,9 +36,9 @@
 
 &lt;p&gt;The final dataset yields 29192 lines and is 11MB. I’ve split as 25000 lines as training set and the rest 4192 lines as the validation set. This is a fraction of the amount of data the baseline model was trained on (&lt;a href=&quot;https://github.com/microsoft/DialoGPT&quot;&gt;DialoGPT was trained on 147M multi-turn dialogue from Reddit&lt;/a&gt;). Regardless, I found that I was able to get reasonable results with these small datasets.&lt;/p&gt;
 
-&lt;p&gt;Here is the final objective distribution that we aim to model.&lt;/p&gt;
+&lt;p&gt;Here is the final objective distribution (for a reply of length &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-79f87014553f5184b3cd09f19cd17710.png&quot; /&gt;):&lt;/p&gt;
 
-&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-1130b28c21c2a95b5536f6c7eb3bc1f6.png&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img class=&quot;center&quot; src=&quot;/latex/latex-7dbbb6c1c1e864356562ddd86f3865a1.png&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;model-architecture&quot;&gt;Model architecture&lt;/h2&gt;
 &lt;p&gt;The architecture is taken directly from the &lt;a href=&quot;https://medium.com/huggingface/how-to-build-a-state-of-the-art-conversational-ai-with-transfer-learning-2d818ac26313&quot;&gt;HuggingFace’s ConvAI2 (NeurIPS 2018) winning model&lt;/a&gt;. The language modeling head is making the actual token predictions, with an extra next sentence classification head added on to the hidden states of the last token to discriminate between the correct reply and a negatively sampled reply. Refer to the linked blogpost and the code for details – the transformer network (and attention module) is a fascinating piece of work that deserves close… &lt;em&gt;attention&lt;/em&gt;. For the sake of this post, you can think of the attention module as learning a masking function that focuses on each word in a given sentence (in a &lt;em&gt;fill-in-the-blank&lt;/em&gt; manner).&lt;/p&gt;
@@ -66,11 +66,11 @@
 &lt;p&gt;I’ve updated the data processing step to pad the data to become a fixed width of 128 and ignore rows that overflow – we are good to go.&lt;/p&gt;
 
 &lt;h3 id=&quot;epoch&quot;&gt;Epoch&lt;/h3&gt;
-&lt;p&gt;I kicked off an exploratory run with epoch of 4 to see if multi-epoch training is even reasonable. Small dataset, large model size and sparse tokens seems like a recipe for overfitting, so I chose a batch size of 1 TPU (which gives us an update batch size of 8, as there are 8 TPU cores). Next sentence prediction task was not used in this run.&lt;/p&gt;
+&lt;p&gt;I kicked off an exploratory run with epoch of 4 to see if multi-epoch training is even reasonable. Small dataset, large model size and sparse tokens seems like a recipe for overfitting, so I chose a batch size of 1 per TPU (which gives us an update batch size of 8, as there are 8 TPU cores). Next sentence prediction task was not used in this run.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/jaegpt/epoch_tune.png&quot; alt=&quot;Train vs Eval in Epoch 4&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;We seem to overfit after 1 epoch. The remainder runs in this post were trained using a single epoch.&lt;/p&gt;
+&lt;p&gt;We seem to overfit after 1 epoch, with eval loss increasing after 2 epoch.&lt;/p&gt;
 
 &lt;h3 id=&quot;task-weight-exploration&quot;&gt;Task weight exploration&lt;/h3&gt;
 
@@ -156,9 +156,428 @@
 &lt;p&gt;Increasing the &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt; parameter does not result in linear increase to MC loss, with &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f6fbad6a2333abe8d09954cff4137205.png&quot; /&gt; showing the best result. In fact, a multiplier of 100 shows a worse result than random guess! I couldn’t think of a reasonable explanation for this; my guess is it has to do with steep gradient magnitudes with higher &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt;; plotting magnitude of gradient might give us a better idea here.&lt;/p&gt;
 
 &lt;h3 id=&quot;bayes-hyperparameter-optimization&quot;&gt;Bayes hyperparameter optimization&lt;/h3&gt;
-&lt;p&gt;We did some initial exploration of model architectures; now let’s systematically explore the entire search space to get the best candidate. To do this, we utilize &lt;a href=&quot;https://github.com/wandb/client/tree/master/wandb/sweeps&quot;&gt;Weights &amp;amp; Biases’ excellent sweep utility&lt;/a&gt;, with the &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/search.yml&quot;&gt;config&lt;/a&gt; tuned to search the MC task weight and the learning rate. The sweep was done on a GPU instance as I ran into some issues with TPU process hanging, so with a batch size of 1.&lt;/p&gt;
+&lt;p&gt;We did some initial exploration of model architectures; now let’s systematically explore the entire search space to get the best candidate. To do this, we utilize &lt;a href=&quot;https://github.com/wandb/client/tree/master/wandb/sweeps&quot;&gt;Weights &amp;amp; Biases’ excellent sweep utility&lt;/a&gt;, with the &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/search.yml&quot;&gt;config&lt;/a&gt; tuned to run various configurations. The sweep algorithm is very simple, it fits a gaussian process regressor on parameter and samples from the trained distribution.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/sweep.png&quot; alt=&quot;Eval MC Loss&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The results of the runs are listed below:&lt;/p&gt;
+
+&lt;table&gt;
+  
+    
+    &lt;tr&gt;
+      
+        &lt;th&gt;Learning Rate&lt;/th&gt;
+      
+        &lt;th&gt;MC Task Weight&lt;/th&gt;
+      
+        &lt;th&gt;Epoch&lt;/th&gt;
+      
+        &lt;th&gt;Batch Size&lt;/th&gt;
+      
+        &lt;th&gt;MC Loss&lt;/th&gt;
+      
+        &lt;th&gt;LM Loss&lt;/th&gt;
+      
+    &lt;/tr&gt;
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        5.18e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0493938
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.2804
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3287
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        4.15e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0475979
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.2951
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3339
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        4.41e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.026687
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3102
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3351
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        6.16e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0051356
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3154
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3364
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        4.66e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0073607
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3241
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3367
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        2.96e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0223147
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        4
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.319
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3451
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        5.86e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0147082
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        4
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.2968
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3544
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        5.46e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0419673
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        1
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        4
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3124
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3571
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        0.0001275
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0195402
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        1
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3133
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3706
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        8.3e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0365972
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        1
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3181
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.3762
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        7.55e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0220401
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        3
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.2633
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.4274
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        8.66e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.022435
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        3
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.2549
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.4661
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        9.43e-05
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0229404
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        3
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.262
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        4.4974
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        0.0008321
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.011086
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        1
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        4
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3276
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        5.1287
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        0.0014851
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        0.0079413
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        1
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        4
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.3417
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        5.9006
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+    
+
+    &lt;tr class=&quot;row1&quot;&gt;
+&lt;td class=&quot;col1&quot;&gt;
+        0.0001262
+    &lt;/td&gt;&lt;td class=&quot;col2&quot;&gt;
+        46.8726004
+    &lt;/td&gt;&lt;td class=&quot;col3&quot;&gt;
+        2
+    &lt;/td&gt;&lt;td class=&quot;col4&quot;&gt;
+        8
+    &lt;/td&gt;&lt;td class=&quot;col5&quot;&gt;
+        1.334
+    &lt;/td&gt;&lt;td class=&quot;col6&quot;&gt;
+        7.0459
+    &lt;/td&gt;&lt;/tr&gt;
+
+  
+&lt;/table&gt;
+
+&lt;p&gt;I’ve kicked off a final training run with all data with the following parameters:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-afeb466cb4ee4edf8f6319eee1fb93a8.png&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-24bd77d4a18ce9f7dc612e1f5f62d506.png&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-b67d941e3161239fe32db79dd933e200.png&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;img class=&quot;inline&quot; src=&quot;/latex/latex-5f7a43e67fa4762254dbdb150b39e8a0.png&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;conversation-examples&quot;&gt;Conversation examples&lt;/h2&gt;
+&lt;p&gt;I’ve generated some samples using the &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/interact.py&quot;&gt;generator script in the repository&lt;/a&gt;. It relies on HuggingFace’s implementation of beam search, where a token is sampled from the predicted distribution of tokens (with previous tokens as the prior). After some trial and error I’ve arrived at &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-1e1e36d25130ce0cc23586ce5aa776f9.png&quot; /&gt; (filter out tokens where probability is &amp;lt; 0.25, and choose top 100 tokens).&lt;/p&gt;
+
+&lt;h3 id=&quot;jae-gpt-on-his-hobbies&quot;&gt;Jae-GPT on his hobbies.&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; What hobbies do you enjoy in your free time
+JaeGPT: I'm not sure what I enjoy in free time, but I'm not really into hip hop or
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Are you actively working on developing your hobbies
+JaeGPT: I like to listen to music and play video games, but also like to play video game games and
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Which video games?
+JaeGPT: I'm working on a game called Minecraft that's pretty fun and addictive, but it's not optimized
+
+
+
+&amp;gt;&amp;gt;&amp;gt; You're trying to create Minecraft
+JaeGPT: I don't think Minecraft is a good idea for a first time user. It's a lot of
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;jae-gpt-on-collecting-wrist-watches&quot;&gt;Jae-GPT on collecting wrist watches.&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Do you like collecting wristwatches
+JaeGPT: I don't like watches but I like watches that look cool and I like the design of them and
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Which watch do you think looks the coolest
+JaeGPT: I like watches with a nice design and a good finish but I don't really like watches as a
+
+
+
+&amp;gt;&amp;gt;&amp;gt; as a tool?
+JaeGPT: I think it looks pretty cool but I think it's too much work for me to wear everyday lol
+
+
+
+&amp;gt;&amp;gt;&amp;gt; I like to wear my nomos everyday
+JaeGPT: i don't like watches that's too formal but i like watches for everyday wear so i'll probably
+
+
+
+&amp;gt;&amp;gt;&amp;gt; wear an apple watch?
+JaeGPT: I'm thinking of buying a watch with a strap that's more comfortable to wear on the wrist and
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;jae-gpt-on-discussing-the-stock-market&quot;&gt;Jae-GPT on discussing the stock market.&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Should I buy some options on Robinhood
+JaeGPT: What's Robinhood? I'm not sure if it's a mutual fund or not lololol
+
+
+
+&amp;gt;&amp;gt;&amp;gt; It's a brokerage
+JaeGPT: I'm not a big investor in Robinhood but I'm a big fan of the company and I
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Are you bullish or bearish on Robinhood
+JaeGPT: I think I'm bullish on Robin hood but I think I'll be bullish on Amazon and Google too
+
+
+
+&amp;gt;&amp;gt;&amp;gt; So you like all the tech stocks
+JaeGPT: I'm bullish for Robinhood too but I don't think I can get into FB or Google lol
+
+
+
+&amp;gt;&amp;gt;&amp;gt; But you work for Facebook
+JaeGPT: I think you can get a job at Google or Amazon too if you're a tech company and you
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;jae-gpt-on-wealth-accumulation&quot;&gt;Jae-GPT on wealth accumulation.&lt;/h3&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; What kind of life do you want to live?
+JaeGPT: I want to be a billionaire but I don't want to go back to school and live a life
+
+
+
+&amp;gt;&amp;gt;&amp;gt; It's not easy to become a billionaire.
+JaeGPT: I'm not sure if I can do that But I'm willing to try my best to make it
+
+
+
+&amp;gt;&amp;gt;&amp;gt; Get rich or die trying
+JaeGPT: I want a billionaire to live a long life so I can be a millionaire again and live the rest
+
+
+
+&amp;gt;&amp;gt;&amp;gt; You're going to become a millionaire from a billionaire?
+JaeGPT: I'm going to be a billionaire from a millionaire I'm going into a billionaire I'm not going
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 </content>
  </entry>
  
