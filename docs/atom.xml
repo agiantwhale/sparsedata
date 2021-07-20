@@ -4,7 +4,7 @@
  <title>Explorations in ML</title>
  <link href="https://tensor.blog/atom.xml" rel="self"/>
  <link href="https://tensor.blog/"/>
- <updated>2021-07-19T16:44:21-07:00</updated>
+ <updated>2021-07-19T19:04:49-07:00</updated>
  <id>https://tensor.blog</id>
  <author>
    <name>Il Jae Lee</name>
@@ -29,8 +29,9 @@
   &lt;li&gt;Set a threshold to yield a new context (I’ve chosen this as 50th percentile of message time delta).&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Overall, the preparation pipeline looks as follows:
-&lt;img src=&quot;/assets/jaegpt/data_gen.png&quot; alt=&quot;GPT Data Generation Pipeline&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Overall, the preparation pipeline looks as follows:&lt;/p&gt;
+
+&lt;p&gt;&lt;img alt=&quot;Data Design&quot; src=&quot;/assets/080ffd-9b97b12b201cad3f403a9460b25c753e200c1f8277f46ba1ef74f2ec7aad857f.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The context of the model is preceding 4 messages before my reply. 3 distractors are chosen from the sent replies in the current chat for the supervision task. I haven’t investigated the effects of these two parameter choices – tuning these context and distractor parameters could be an interesting study.&lt;/p&gt;
 
@@ -43,7 +44,7 @@
 &lt;h2 id=&quot;model-architecture&quot;&gt;Model architecture&lt;/h2&gt;
 &lt;p&gt;The architecture is taken directly from the &lt;a href=&quot;https://medium.com/huggingface/how-to-build-a-state-of-the-art-conversational-ai-with-transfer-learning-2d818ac26313&quot;&gt;HuggingFace’s ConvAI2 (NeurIPS 2018) winning model&lt;/a&gt;. The language modeling head is making the actual token predictions, with an extra next sentence classification head added on to the hidden states of the last token to discriminate between the correct reply and a negatively sampled reply. Refer to the linked blogpost and the code for details – the transformer network (and attention module) is a fascinating piece of work that deserves close… &lt;em&gt;attention&lt;/em&gt;. For the sake of this post, you can think of the attention module as learning a masking function that focuses on each word in a given sentence (in a &lt;em&gt;fill-in-the-blank&lt;/em&gt; manner).&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/model_design.png&quot; alt=&quot;GPT2 Double Head Model Design&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Model Design&quot; src=&quot;/assets/3252d5-2893c45230d669469248a31c517076502b4e43ccd1f7032790e2d3014b1f9d56.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;It seems the discriminator head is designed to act as a weak supervision function to aid language modeling task (through cross learning), but &lt;strong&gt;I didn’t notice any noticable improvements to the main LM task without it.&lt;/strong&gt; More details in the following sections.&lt;/p&gt;
 
@@ -61,14 +62,14 @@
 &lt;h3 id=&quot;block-size&quot;&gt;Block size&lt;/h3&gt;
 &lt;p&gt;This is to resolve the fixed tensor requirement with the TPU above. I wrote a script to calculate percentage of training rows that go above limit at each tokenization step. From the chart below, it seems we get a 99% yield with block size of &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-e0afb0c7a5e6c6ec867e9bbea08b6b10.png&quot; /&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/block_size.png&quot; alt=&quot;GPT2 Double Head Model Design&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Block size and final data yield&quot; src=&quot;/assets/40c68c-af8a1995113ef38010ca5d76bbcdabff1d848cb9fd7690e177884883b9de0343.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;I’ve updated the data processing step to pad the data to become a fixed width of 128 and ignore rows that overflow – we are good to go.&lt;/p&gt;
 
 &lt;h3 id=&quot;epoch&quot;&gt;Epoch&lt;/h3&gt;
 &lt;p&gt;I kicked off an exploratory run with epoch of 4 to see if multi-epoch training is even reasonable. Small dataset, large model size and sparse tokens seems like a recipe for overfitting, so I chose a batch size of 1 per TPU (which gives us an update batch size of 8, as there are 8 TPU cores). Next sentence prediction task was not used in this run.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/epoch_tune.png&quot; alt=&quot;Train vs Eval in Epoch 4&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Eval vs Train Loss, Epoch&quot; src=&quot;/assets/6e670d-583ed536591dd313f68ac6d8e73413cb1064e2ce622e611d77ac6622e997c067.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We seem to overfit after 1 epoch, with eval loss increasing after 2 epoch.&lt;/p&gt;
 
@@ -143,22 +144,22 @@
 
 &lt;p&gt;And their corresponding learning curves:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/lm_loss.png&quot; alt=&quot;Eval LM Loss&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Eval LM Loss&quot; src=&quot;/assets/58abfa-fe7641420f092273b283e4fb725aa6a2ce4373f40f074c3a528a546a67db6575.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Using the supervision tasks shows minimal improvement to the main LM loss; rather makes it worse.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/acc.png&quot; alt=&quot;Eval Accuracy&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Eval Accuracy&quot; src=&quot;/assets/5e22d3-4ade7ea546028b192758d1d1f095de3973c0fbe05b69b7d070751e3ca8200979.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In constract to &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-6c9c382af2e89e83ff13a592ab81e473.png&quot; /&gt;, the inclusion of supervision tasks increase the LM modeling accuracy. However this isn’t a good metric to optimize for, as we will be using beam search to generate responses through sampling; learning an accurate distribution of next token is more important than predicting the most likely token.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/mc_loss.png&quot; alt=&quot;Eval MC Loss&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Eval MC Loss&quot; src=&quot;/assets/da7491-1bfc19dfd9b57040cca9ca44bba2649b0091d3329688f372d58054b6eafd497f.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Increasing the &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt; parameter does not result in linear increase to MC loss, with &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-f6fbad6a2333abe8d09954cff4137205.png&quot; /&gt; showing the best result. In fact, a multiplier of 100 shows a worse result than random guess! I couldn’t think of a reasonable explanation for this; my guess is it has to do with steep gradient magnitudes with higher &lt;img class=&quot;inline&quot; src=&quot;/latex/latex-c08a7b5eb987e4198f55df3047c97bf7.png&quot; /&gt;; plotting magnitude of gradient might give us a better idea here.&lt;/p&gt;
 
 &lt;h3 id=&quot;bayes-hyperparameter-optimization&quot;&gt;Bayes hyperparameter optimization&lt;/h3&gt;
 &lt;p&gt;We did some initial exploration of model architectures; now let’s systematically explore the entire search space to get the best candidate. To do this, we utilize &lt;a href=&quot;https://github.com/wandb/client/tree/master/wandb/sweeps&quot;&gt;Weights &amp;amp; Biases’ excellent sweep utility&lt;/a&gt;, with the &lt;a href=&quot;https://github.com/agiantwhale/jaegpt/blob/master/search.yml&quot;&gt;config&lt;/a&gt; tuned to run various configurations. The sweep algorithm is very simple, it fits a gaussian process regressor on parameter and samples from the trained distribution.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/jaegpt/sweep.png&quot; alt=&quot;Eval MC Loss&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&quot;Sweep Results&quot; src=&quot;/assets/298c25-e79449652157108550e94ada12b69cb3b360c8fda7288f2ea1c994339c195fd1.png&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The results of the runs are listed below:&lt;/p&gt;
 
@@ -628,7 +629,7 @@ JaeGPT: I'm thinking of moving to SF, but I'm not sure if I can get a job there
 
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;jae-gpt-on-gaming-pc-is-worth-it&quot;&gt;Jae-GPT on gaming PC is worth it.&lt;/h3&gt;
+&lt;h3 id=&quot;jae-gpt-on-gaming-pc&quot;&gt;Jae-GPT on gaming PC.&lt;/h3&gt;
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; Is a gaming PC worth it
 JaeGPT: I don't think so But I'm not sure if it's worth it to buy a gaming computer
 

@@ -2,11 +2,12 @@
 title:               Explorations in ML
 tagline:             'thinking machines'
 description:         'A blog on machine learning, probabilistic methods and intelligent systems.'
-url:                 https://tensor.blog
+url:                 'https://tensor.blog'
 baseurl:             ''
 paginate:            5
 permalink:           pretty
 destination:         docs/
+encoding:            utf-8
 
 # Liquid latex
 liquid_latex:
@@ -26,8 +27,22 @@ sass:
 assets:
   compression: true
   gzip: true
+  destination: /assets
   sources:
     - _assets/
+    - assets/
+  plugins:
+    img:
+      optim:
+        jekyll:
+          pngout: false
+          optipng:
+            level: 7
+            interlace: false
+            strip: true
+          pngquant:
+            allow_lossy: true
+            speed: 1
 
 compress_html:
   clippings: all

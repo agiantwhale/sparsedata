@@ -19,9 +19,11 @@
   {% if page.title == "Home" %}
     {%- assign title = site.title | append: ' &middot; ' | append: site.tagline -%}
     {%- assign description = site.description -%}
+    {%- assign type = 'website' %}
   {% else %}
     {%- assign title = page.title | append: ' &middot; ' | append: site.title -%}
     {%- assign description = page.description -%}
+    {%- assign type = 'article' %}
   {% endif %}
 
   <title>{{ title }}</title>
@@ -30,27 +32,19 @@
   <link rel="canonical" href="{{ page.url | absolute_url }}">
   {% endif %}
 
-  {% capture style %}
-  {% asset css/poole.css %}
-  {% asset css/lanyon.css %}
-  {% asset css/syntax.css %}
-  {% endcapture %}
+  {% asset css/poole.css @inline %}
+  {% asset css/lanyon.css @inline %}
+  {% asset css/syntax.css @inline %}
 
-  <style>
-  {{ style | scssify }}
-  </style>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400&display=swap">
-
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ '/public/apple-touch-icon-precomposed.png' | absolute_url }}">
-  <link rel="shortcut icon" href="{{ '/public/favicon.ico' | absolute_url }}">
-
   <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ '/atom.xml' | absolute_url }}">
 
   {% if page.social_image %}
-    <meta property="og:image" content="{{ page.social_image | absolute_url }}"/>
+    <meta property="og:image" content="{{ site.url }}{% asset '{{page.social_image}}' @path @optim %}"/>
   {% endif %}
 
   <meta property="og:url" content="{{ page.url | absolute_url }}"/>
+  <meta property="og:type" content="{{ type }}"/>
   {% if title %}<meta property="og:title" content="{{ title }}"/>{% endif %}
   {% if description %}<meta property="og:description" content="{{ description }}"/>{% endif %}
 </head>
