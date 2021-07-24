@@ -4,7 +4,7 @@
  <title>Explorations in ML</title>
  <link href="https://tensor.blog/atom.xml" rel="self"/>
  <link href="https://tensor.blog/"/>
- <updated>2021-07-19T19:04:49-07:00</updated>
+ <updated>2021-07-23T23:55:59-07:00</updated>
  <id>https://tensor.blog</id>
  <author>
    <name>Il Jae Lee</name>
@@ -46,7 +46,7 @@
 
 &lt;p&gt;&lt;img alt=&quot;Model Design&quot; src=&quot;/assets/3252d5-2893c45230d669469248a31c517076502b4e43ccd1f7032790e2d3014b1f9d56.png&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;It seems the discriminator head is designed to act as a weak supervision function to aid language modeling task (through cross learning), but &lt;strong&gt;I didn’t notice any noticable improvements to the main LM task without it.&lt;/strong&gt; More details in the following sections.&lt;/p&gt;
+&lt;p&gt;It seems the discriminator head is designed to act as a weak supervision function to aid language modeling task (through cross learning), but &lt;strong&gt;I didn’t notice any noticable improvements to the main LM task.&lt;/strong&gt; More details in the following sections.&lt;/p&gt;
 
 &lt;h2 id=&quot;training-implementation&quot;&gt;Training implementation&lt;/h2&gt;
 &lt;p&gt;I’m relying on HuggingFace’s Transformer library to train the model on Google Colab’s TPUs. I ran into several problems, which I mostly fixed by copy-paste engineering and customizing to suit my needs:&lt;/p&gt;
